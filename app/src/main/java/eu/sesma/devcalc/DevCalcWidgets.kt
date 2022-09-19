@@ -11,7 +11,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
@@ -23,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
@@ -157,6 +157,7 @@ fun PinPanelPreview() {
 fun ScreenItem(
     modifier: Modifier = Modifier,
     calculationLine: CalculationLine,
+    isEditLine: Boolean,
 ) {
     val padding = 32.dp
     val paddingPx = with(LocalDensity.current) { padding.toPx() }
@@ -175,19 +176,23 @@ fun ScreenItem(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            BasicTextField(
-                modifier = Modifier
-                    .padding(start = 4.dp)
-                    .horizontalScroll(enabled = false, state = ScrollState(initial = 0)),
-                value = calculationLine.calculation,
-                onValueChange = {},
-                readOnly = true,
-                singleLine = true,
-                maxLines = 2,
-                onTextLayout = {
-                    calculationWidth = it.size.width
-                    doubleLine = calculationWidth + resultWidth > maxWidth
-                })
+            CompositionLocalProvider(
+                LocalTextInputService provides null
+            ) {
+                BasicTextField(
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .horizontalScroll(enabled = false, state = ScrollState(initial = 0)),
+                    value = calculationLine.calculation,
+                    onValueChange = { },
+                    readOnly = !isEditLine,
+                    singleLine = true,
+                    maxLines = 2,
+                    onTextLayout = {
+                        calculationWidth = it.size.width
+                        doubleLine = calculationWidth + resultWidth > maxWidth
+                    })
+            }
             AnimatedVisibility(
                 visible = !doubleLine,
                 exit = fadeOut(animationSpec = keyframes { durationMillis = 0 })
@@ -226,7 +231,8 @@ fun ScreenItem(
 fun ScreenItemPreviewShort() {
     DevCalcTheme {
         ScreenItem(
-            calculationLine = CalculationLine(calculation = "125+500", result = "625")
+            calculationLine = CalculationLine(calculation = "125+500", result = "625"),
+            isEditLine = false
         )
     }
 }
@@ -247,8 +253,8 @@ fun ScreenList(
         state = scrollState,
         reverseLayout = true,
     ) {
-        items(calculations) {  calculation ->
-            ScreenItem(calculationLine = calculation)
+        itemsIndexed(calculations) { index, calculation ->
+            ScreenItem(calculationLine = calculation, isEditLine = index == 0)
             Divider(thickness = 1.dp, color = Color.DarkGray)
         }
     }
@@ -257,7 +263,7 @@ fun ScreenList(
 @Composable
 fun CalcComposeView(
     modifier: Modifier = Modifier.fillMaxSize(),
-    calculations: List<CalculationLine> = emptyList(),
+    calculations: MutableState<List<CalculationLine>>,
     onClick: (Int) -> Unit = {},
 ) {
     CompositionLocalProvider(
@@ -269,7 +275,7 @@ fun CalcComposeView(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ScreenList(calculations = calculations)
+            ScreenList(calculations = calculations.value)
             Surface(modifier = Modifier.weight(1f)) {}
             PinPanel(modifier = Modifier.padding(bottom = 32.dp), onClick = onClick)
         }
@@ -280,6 +286,13 @@ fun CalcComposeView(
 @Composable
 fun CalcComposeViewPreview() {
     DevCalcTheme {
-        CalcComposeView( calculations = listOf(CalculationLine(calculation = "125+500", result = "625"), CalculationLine(calculation = "25669882/5566", result = "2255")))
+        CalcComposeView(
+            calculations = mutableStateOf(
+                listOf(
+                    CalculationLine(calculation = "125+500", result = "625"),
+                    CalculationLine(calculation = "25669882/5566", result = "2255")
+                )
+            )
+        )
     }
 }
