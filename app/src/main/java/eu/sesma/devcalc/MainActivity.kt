@@ -1,6 +1,7 @@
 package eu.sesma.devcalc
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.mutableStateOf
@@ -28,10 +29,15 @@ class MainActivity : ComponentActivity() {
             DevCalcTheme {
                 CalcComposeView(
                     calculations = calculationsState,
-                    onClick = ::onKeyClicked
+                    onKeyClick = ::onKeyClicked,
+                    onScreenClick = ::onScreenClicked
                 )
             }
         }
+    }
+
+    private fun onScreenClicked(lineIndex: Int, fieldIndex: Int) {
+        Log.d("==>", "Click line $lineIndex, field $fieldIndex")
     }
 
     private fun onKeyClicked(keyCode: Int) {

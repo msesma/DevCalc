@@ -5,13 +5,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
@@ -157,6 +154,8 @@ fun PinPanelPreview() {
 fun ScreenItem(
     modifier: Modifier = Modifier,
     calculationLine: CalculationLine,
+    lineIndex: Int,
+    onClick: (Int, Int) -> Unit
 ) {
     val padding = 32.dp
     val paddingPx = with(LocalDensity.current) { padding.toPx() }
@@ -185,13 +184,15 @@ fun ScreenItem(
                             enabled = true,
                             state = ScrollState(initial = 0),
                             reverseScrolling = true
-                        ),
+                        )
+                        .clickable { onClick(lineIndex, 0) },
                     value = calculationLine.operation,
                     textStyle = LocalTextStyle.current,
                     onValueChange = { },
                     readOnly = true,
                     singleLine = true,
                     visualTransformation = CursorTransformation(),
+                    enabled = false,
                     onTextLayout = {
                         calculationWidth = it.size.width
                         doubleLine = calculationWidth + resultWidth > maxWidth && calculationLine.result.isNotEmpty()
@@ -202,12 +203,15 @@ fun ScreenItem(
                 exit = fadeOut(animationSpec = keyframes { durationMillis = 0 })
             ) {
                 BasicTextField(
-                    modifier = Modifier.padding(end = 4.dp),
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .clickable { onClick(lineIndex, 1) },
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End),
                     value = calculationLine.result,
                     onValueChange = {},
-                    readOnly = true,
+                    readOnly = false,
                     singleLine = true,
+                    enabled = false,
                     onTextLayout = {
                         resultWidth = it.size.width
                         doubleLine = calculationWidth + resultWidth > maxWidth && calculationLine.result.isNotEmpty()
@@ -219,12 +223,14 @@ fun ScreenItem(
                 modifier = Modifier
                     .wrapContentHeight()
                     .fillMaxWidth()
-                    .padding(end = 4.dp),
+                    .padding(end = 4.dp)
+                    .clickable { onClick(lineIndex, 1) },
                 textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End),
                 value = calculationLine.result,
                 onValueChange = {},
                 readOnly = true,
                 singleLine = true,
+                enabled = false,
                 onTextLayout = {})
         }
     }
@@ -236,6 +242,8 @@ fun ScreenItemPreviewShort() {
     DevCalcTheme {
         ScreenItem(
             calculationLine = CalculationLine(operation = "125+500", result = "625"),
+            lineIndex = 0,
+            onClick = { _, _ -> }
         )
     }
 }
@@ -244,6 +252,7 @@ fun ScreenItemPreviewShort() {
 fun ScreenList(
     modifier: Modifier = Modifier,
     calculations: List<CalculationLine>,
+    onClick: (Int, Int) -> Unit
 ) {
     val scrollState = rememberLazyListState()
     LazyColumn(
@@ -256,8 +265,8 @@ fun ScreenList(
         state = scrollState,
         reverseLayout = true,
     ) {
-        items(calculations) { calculation ->
-            ScreenItem(calculationLine = calculation)
+        itemsIndexed(calculations) { index, calculation ->
+            ScreenItem(calculationLine = calculation, lineIndex = index, onClick = onClick)
             Divider(thickness = 1.dp, color = Color.DarkGray)
         }
     }
@@ -267,7 +276,8 @@ fun ScreenList(
 fun CalcComposeView(
     modifier: Modifier = Modifier.fillMaxSize(),
     calculations: MutableState<List<CalculationLine>>,
-    onClick: (Int) -> Unit = {},
+    onKeyClick: (Int) -> Unit,
+    onScreenClick: (Int, Int) -> Unit,
 ) {
     CompositionLocalProvider(
         LocalContentColor provides MaterialTheme.colors.onBackground
@@ -278,9 +288,9 @@ fun CalcComposeView(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ScreenList(calculations = calculations.value)
+            ScreenList(calculations = calculations.value, onClick = onScreenClick)
             Surface(modifier = Modifier.weight(1f)) {}
-            PinPanel(modifier = Modifier.padding(bottom = 32.dp), onClick = onClick)
+            PinPanel(modifier = Modifier.padding(bottom = 32.dp), onClick = onKeyClick)
         }
     }
 }
@@ -295,7 +305,9 @@ fun CalcComposeViewPreview() {
                     CalculationLine(operation = "125+500", result = "625"),
                     CalculationLine(operation = "25669882/5566", result = "2255")
                 )
-            )
+            ),
+            onKeyClick = {},
+            onScreenClick = { _, _ -> }
         )
     }
 }
