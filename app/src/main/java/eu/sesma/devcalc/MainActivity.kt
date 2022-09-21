@@ -1,7 +1,6 @@
 package eu.sesma.devcalc
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.mutableStateOf
@@ -14,9 +13,14 @@ enum class Actions {
 
 class MainActivity : ComponentActivity() {
 
+    companion object {
+        const val CURSOR = "|"
+    }
+
     private var currentCalculation = CalculationLine()
     private var calculations = mutableListOf<CalculationLine>()
     private val calculationsState = mutableStateOf(listOf(currentCalculation))
+    private var cursorPosition = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,23 +66,47 @@ class MainActivity : ComponentActivity() {
 
         if (keyValue != null) {
             currentCalculation =
-                currentCalculation.copy(calculation = currentCalculation.calculation + keyValue)
+                currentCalculation.copy(
+                    operation = currentCalculation.operation.replaceFirst(
+                        CURSOR,
+                        "$keyValue$CURSOR"
+                    )
+                )
             calculationsState.value = listOf(currentCalculation) + calculations
-            Log.d("==>", "currentCalculation = $currentCalculation")
+            cursorPosition++
         }
 
         if (keyAction != null) {
+
             when (keyAction) {
                 CLEAR -> currentCalculation = CalculationLine()
                 ENTER -> {
-                    val newResult = currentCalculation.copy(result = currentCalculation.calculation)
+                    val noCursorOperation = currentCalculation.operation.replaceFirst(CURSOR, "")
+                    val newResult = currentCalculation.copy(operation = noCursorOperation, result = noCursorOperation)
                     calculations.add(0, newResult)
                     currentCalculation = CalculationLine()
+                }
+                BACK -> if (cursorPosition > 0) {
+                    cursorPosition--
+                    addCursor()
+                }
+                FORTH -> if (cursorPosition < currentCalculation.operation.length - 1) {
+                    cursorPosition++
+                    addCursor()
                 }
                 else -> Unit
             }
             calculationsState.value = listOf(currentCalculation) + calculations
         }
 
+    }
+
+    private fun addCursor() {
+        val noCursorOperation = currentCalculation.operation.replaceFirst(CURSOR, "")
+        currentCalculation = currentCalculation.copy(
+            operation = noCursorOperation.substring(0, cursorPosition) +
+                    CURSOR +
+                    noCursorOperation.substring(cursorPosition, noCursorOperation.length)
+        )
     }
 }

@@ -11,7 +11,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
@@ -157,7 +157,6 @@ fun PinPanelPreview() {
 fun ScreenItem(
     modifier: Modifier = Modifier,
     calculationLine: CalculationLine,
-    isEditLine: Boolean,
 ) {
     val padding = 32.dp
     val paddingPx = with(LocalDensity.current) { padding.toPx() }
@@ -182,15 +181,20 @@ fun ScreenItem(
                 BasicTextField(
                     modifier = Modifier
                         .padding(start = 4.dp)
-                        .horizontalScroll(enabled = false, state = ScrollState(initial = 0)),
-                    value = calculationLine.calculation,
+                        .horizontalScroll(
+                            enabled = true,
+                            state = ScrollState(initial = 0),
+                            reverseScrolling = true
+                        ),
+                    value = calculationLine.operation,
+                    textStyle = LocalTextStyle.current,
                     onValueChange = { },
-                    readOnly = !isEditLine,
+                    readOnly = true,
                     singleLine = true,
-                    maxLines = 2,
+                    visualTransformation = CursorTransformation(),
                     onTextLayout = {
                         calculationWidth = it.size.width
-                        doubleLine = calculationWidth + resultWidth > maxWidth
+                        doubleLine = calculationWidth + resultWidth > maxWidth && calculationLine.result.isNotEmpty()
                     })
             }
             AnimatedVisibility(
@@ -206,7 +210,7 @@ fun ScreenItem(
                     singleLine = true,
                     onTextLayout = {
                         resultWidth = it.size.width
-                        doubleLine = calculationWidth + resultWidth > maxWidth
+                        doubleLine = calculationWidth + resultWidth > maxWidth && calculationLine.result.isNotEmpty()
                     })
             }
         }
@@ -231,8 +235,7 @@ fun ScreenItem(
 fun ScreenItemPreviewShort() {
     DevCalcTheme {
         ScreenItem(
-            calculationLine = CalculationLine(calculation = "125+500", result = "625"),
-            isEditLine = false
+            calculationLine = CalculationLine(operation = "125+500", result = "625"),
         )
     }
 }
@@ -253,8 +256,8 @@ fun ScreenList(
         state = scrollState,
         reverseLayout = true,
     ) {
-        itemsIndexed(calculations) { index, calculation ->
-            ScreenItem(calculationLine = calculation, isEditLine = index == 0)
+        items(calculations) { calculation ->
+            ScreenItem(calculationLine = calculation)
             Divider(thickness = 1.dp, color = Color.DarkGray)
         }
     }
@@ -289,8 +292,8 @@ fun CalcComposeViewPreview() {
         CalcComposeView(
             calculations = mutableStateOf(
                 listOf(
-                    CalculationLine(calculation = "125+500", result = "625"),
-                    CalculationLine(calculation = "25669882/5566", result = "2255")
+                    CalculationLine(operation = "125+500", result = "625"),
+                    CalculationLine(operation = "25669882/5566", result = "2255")
                 )
             )
         )

@@ -1,6 +1,8 @@
 package eu.sesma.devcalc
 
+import eu.sesma.devcalc.MainActivity.Companion.CURSOR
+
 data class CalculationLine(
-    val calculation: String = "",
+    val operation: String = CURSOR,
     val result: String = "",
 )
