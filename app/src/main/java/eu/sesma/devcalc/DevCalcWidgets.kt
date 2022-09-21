@@ -93,11 +93,11 @@ fun PinPanel(
             modifier = Modifier.width(width),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Key(keyCode = 20, onClick = onClick, text = "AC")
-            Key(keyCode = 21, onClick = onClick, text = "C")
+            Key(keyCode = 20, onClick = onClick, text = "Esc")
+            Key(keyCode = 21, onClick = onClick, text = "Del")
             Key(keyCode = 22, onClick = onClick, text = "<-")
             Key(keyCode = 23, onClick = onClick, text = "->")
-            Key(keyCode = 24, onClick = onClick, text = "Cpy")
+            Key(keyCode = 24, onClick = onClick, text = "")
         }
         Row(
             modifier = Modifier.width(width),
@@ -105,7 +105,7 @@ fun PinPanel(
         ) {
             Key(keyCode = 15, onClick = onClick, text = "7")
             Key(keyCode = 16, onClick = onClick, text = "8")
-            Key(keyCode = 17, onClick = onClick, text = "0")
+            Key(keyCode = 17, onClick = onClick, text = "9")
             Key(keyCode = 18, onClick = onClick, text = "/")
             Key(keyCode = 19, onClick = onClick, text = "")
         }
@@ -183,9 +183,10 @@ fun ScreenItem(
                         .horizontalScroll(
                             enabled = true,
                             state = ScrollState(initial = 0),
-                            reverseScrolling = true
+                            reverseScrolling = lineIndex == 0
                         )
-                        .clickable { onClick(lineIndex, 0) },
+                        .clickable { onClick(lineIndex, 0) }
+                        .then( Modifier.background(if (calculationLine.fieldSelected == 0) Color.Cyan else Color.Transparent)),
                     value = calculationLine.operation,
                     textStyle = LocalTextStyle.current,
                     onValueChange = { },
@@ -205,7 +206,8 @@ fun ScreenItem(
                 BasicTextField(
                     modifier = Modifier
                         .padding(end = 4.dp)
-                        .clickable { onClick(lineIndex, 1) },
+                        .clickable { onClick(lineIndex, 1) }
+                        .then( Modifier.background(if (calculationLine.fieldSelected == 1) Color.Cyan else Color.Transparent)),
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End),
                     value = calculationLine.result,
                     onValueChange = {},
@@ -224,7 +226,13 @@ fun ScreenItem(
                     .wrapContentHeight()
                     .fillMaxWidth()
                     .padding(end = 4.dp)
-                    .clickable { onClick(lineIndex, 1) },
+                    .horizontalScroll(
+                        enabled = true,
+                        state = ScrollState(initial = 0),
+                        reverseScrolling = false
+                    )
+                    .clickable { onClick(lineIndex, 1) }
+                    .then( Modifier.background(if (calculationLine.fieldSelected == 1) Color.Cyan else Color.Transparent)),
                 textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End),
                 value = calculationLine.result,
                 onValueChange = {},
