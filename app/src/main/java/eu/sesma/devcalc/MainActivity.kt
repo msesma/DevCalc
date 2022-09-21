@@ -7,7 +7,8 @@ import eu.sesma.devcalc.ui.theme.DevCalcTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val editor = Editor()
+    private val solver = Solver()
+    private val editor = Editor(solver = solver)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

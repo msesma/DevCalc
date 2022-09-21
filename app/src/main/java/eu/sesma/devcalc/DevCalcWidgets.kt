@@ -211,7 +211,7 @@ fun ScreenItem(
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End),
                     value = calculationLine.result,
                     onValueChange = {},
-                    readOnly = false,
+                    readOnly = true,
                     singleLine = true,
                     enabled = false,
                     onTextLayout = {
@@ -269,7 +269,8 @@ fun ScreenList(
             .fillMaxWidth()
             .height(240.dp)
             .animateContentSize()
-            .border(width = 1.dp, color = Color.DarkGray),
+            .border(width = 1.dp, color = MaterialTheme.colors.onBackground)
+            .background(color = MaterialTheme.colors.surface),
         state = scrollState,
         reverseLayout = true,
     ) {
