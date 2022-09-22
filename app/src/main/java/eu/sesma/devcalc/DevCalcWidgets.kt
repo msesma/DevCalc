@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import eu.sesma.devcalc.ui.theme.DevCalcTheme
+import eu.sesma.devcalc.ui.theme.LcdColor
 
 @Composable
 fun Key(
@@ -167,6 +168,7 @@ fun ScreenItem(
         modifier = modifier
             .wrapContentHeight()
             .fillMaxWidth()
+            .background(color = if(lineIndex==0) Color.White else Color.Unspecified)
     ) {
         Row(
             modifier = Modifier
@@ -186,7 +188,7 @@ fun ScreenItem(
                             reverseScrolling = lineIndex == 0
                         )
                         .clickable { onClick(lineIndex, 0) }
-                        .then( Modifier.background(if (calculationLine.fieldSelected == 0) Color.Cyan else Color.Transparent)),
+                        .then( Modifier.background(if (calculationLine.fieldSelected == 0) Color.Cyan else Color.Unspecified)),
                     value = calculationLine.operation,
                     textStyle = LocalTextStyle.current,
                     onValueChange = { },
@@ -207,7 +209,7 @@ fun ScreenItem(
                     modifier = Modifier
                         .padding(end = 4.dp)
                         .clickable { onClick(lineIndex, 1) }
-                        .then( Modifier.background(if (calculationLine.fieldSelected == 1) Color.Cyan else Color.Transparent)),
+                        .then( Modifier.background(if (calculationLine.fieldSelected == 1) Color.Cyan else Color.Unspecified)),
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End),
                     value = calculationLine.result,
                     onValueChange = {},
@@ -270,7 +272,7 @@ fun ScreenList(
             .height(240.dp)
             .animateContentSize()
             .border(width = 1.dp, color = MaterialTheme.colors.onBackground)
-            .background(color = MaterialTheme.colors.surface),
+            .background(color = LcdColor),
         state = scrollState,
         reverseLayout = true,
     ) {
