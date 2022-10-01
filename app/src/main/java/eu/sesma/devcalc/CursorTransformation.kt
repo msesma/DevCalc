@@ -6,7 +6,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import eu.sesma.devcalc.Editor.Companion.CURSOR
+import eu.sesma.devcalc.Constants.CURSOR
 
 class CursorTransformation() : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {

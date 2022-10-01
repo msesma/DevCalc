@@ -2,16 +2,17 @@ package eu.sesma.devcalc
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import eu.sesma.devcalc.Constants.ADD
+import eu.sesma.devcalc.Constants.CURSOR
+import eu.sesma.devcalc.Constants.DIV
+import eu.sesma.devcalc.Constants.MUL
+import eu.sesma.devcalc.Constants.SUB
 import eu.sesma.devcalc.Editor.Actions.*
 
 class Editor(val solver: Solver) {
 
     enum class Actions {
         ANSWER, ENTER, ESC, DELETE, BACK, FORTH
-    }
-
-    companion object {
-        const val CURSOR = "|"
     }
 
     private var currentCalculation = CalculationLine()
@@ -59,19 +60,19 @@ class Editor(val solver: Solver) {
     private fun getKeyValue(keyCode: Int) = when (keyCode) {
         0 -> "0"
         1 -> "."
-        3 -> "+"
+        3 -> ADD
         5 -> "1"
         6 -> "2"
         7 -> "3"
-        8 -> "-"
+        8 -> SUB
         10 -> "4"
         11 -> "5"
         12 -> "6"
-        13 -> "x"
+        13 -> MUL
         15 -> "7"
         16 -> "8"
         17 -> "9"
-        18 -> "/"
+        18 -> DIV
         else -> null
     }
 

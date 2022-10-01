@@ -28,6 +28,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import eu.sesma.devcalc.Constants.ADD
+import eu.sesma.devcalc.Constants.DIV
+import eu.sesma.devcalc.Constants.MUL
+import eu.sesma.devcalc.Constants.SUB
 import eu.sesma.devcalc.ui.theme.DevCalcTheme
 import eu.sesma.devcalc.ui.theme.LcdColor
 
@@ -107,7 +111,7 @@ fun PinPanel(
             Key(keyCode = 15, onClick = onClick, text = "7")
             Key(keyCode = 16, onClick = onClick, text = "8")
             Key(keyCode = 17, onClick = onClick, text = "9")
-            Key(keyCode = 18, onClick = onClick, text = "/")
+            Key(keyCode = 18, onClick = onClick, text = DIV)
             Key(keyCode = 19, onClick = onClick, text = "")
         }
         Row(
@@ -117,7 +121,7 @@ fun PinPanel(
             Key(keyCode = 10, onClick = onClick, text = "4")
             Key(keyCode = 11, onClick = onClick, text = "5")
             Key(keyCode = 12, onClick = onClick, text = "6")
-            Key(keyCode = 13, onClick = onClick, text = "x")
+            Key(keyCode = 13, onClick = onClick, text = MUL)
             Key(keyCode = 14, onClick = onClick, text = "")
         }
         Row(
@@ -127,7 +131,7 @@ fun PinPanel(
             Key(keyCode = 5, onClick = onClick, text = "1")
             Key(keyCode = 6, onClick = onClick, text = "2")
             Key(keyCode = 7, onClick = onClick, text = "3")
-            Key(keyCode = 8, onClick = onClick, text = "-")
+            Key(keyCode = 8, onClick = onClick, text = SUB)
             Key(keyCode = 9, onClick = onClick, text = "")
         }
         Row(
@@ -137,7 +141,7 @@ fun PinPanel(
             Key(keyCode = 0, onClick = onClick, text = "0")
             Key(keyCode = 1, onClick = onClick, text = ".")
             Key(keyCode = 2, onClick = onClick, text = "Ans")
-            Key(keyCode = 3, onClick = onClick, text = "+")
+            Key(keyCode = 3, onClick = onClick, text = ADD)
             Key(keyCode = 4, onClick = onClick, text = "=")
         }
     }
