@@ -1,6 +1,6 @@
-package eu.sesma.devcalc
+package eu.sesma.devcalc.editor
 
-import eu.sesma.devcalc.Constants.CURSOR
+import eu.sesma.devcalc.editor.Constants.CURSOR
 
 
 data class CalculationLine(

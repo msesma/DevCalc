@@ -28,10 +28,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import eu.sesma.devcalc.Constants.ADD
-import eu.sesma.devcalc.Constants.DIV
-import eu.sesma.devcalc.Constants.MUL
-import eu.sesma.devcalc.Constants.SUB
+import eu.sesma.devcalc.editor.Constants.ADD
+import eu.sesma.devcalc.editor.Constants.DIV
+import eu.sesma.devcalc.editor.Constants.MUL
+import eu.sesma.devcalc.editor.Constants.SUB
+import eu.sesma.devcalc.editor.CalculationLine
+import eu.sesma.devcalc.ui.CursorTransformation
 import eu.sesma.devcalc.ui.theme.DevCalcTheme
 import eu.sesma.devcalc.ui.theme.LcdColor
 

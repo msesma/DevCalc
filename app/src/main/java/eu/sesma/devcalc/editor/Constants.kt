@@ -1,4 +1,4 @@
-package eu.sesma.devcalc
+package eu.sesma.devcalc.editor
 
 object Constants {
     const val CURSOR = "|"

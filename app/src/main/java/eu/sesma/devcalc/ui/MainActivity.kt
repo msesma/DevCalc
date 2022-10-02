@@ -1,8 +1,11 @@
-package eu.sesma.devcalc
+package eu.sesma.devcalc.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import eu.sesma.devcalc.CalcComposeView
+import eu.sesma.devcalc.editor.Editor
+import eu.sesma.devcalc.solver.Solver
 import eu.sesma.devcalc.ui.theme.DevCalcTheme
 
 class MainActivity : ComponentActivity() {

@@ -1,13 +1,14 @@
-package eu.sesma.devcalc
+package eu.sesma.devcalc.editor
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import eu.sesma.devcalc.Constants.ADD
-import eu.sesma.devcalc.Constants.CURSOR
-import eu.sesma.devcalc.Constants.DIV
-import eu.sesma.devcalc.Constants.MUL
-import eu.sesma.devcalc.Constants.SUB
-import eu.sesma.devcalc.Editor.Actions.*
+import eu.sesma.devcalc.editor.Constants.ADD
+import eu.sesma.devcalc.editor.Constants.CURSOR
+import eu.sesma.devcalc.editor.Constants.DIV
+import eu.sesma.devcalc.editor.Constants.MUL
+import eu.sesma.devcalc.editor.Constants.SUB
+import eu.sesma.devcalc.solver.Solver
+import eu.sesma.devcalc.editor.Editor.Actions.*
 
 class Editor(val solver: Solver) {
 
@@ -118,7 +119,10 @@ class Editor(val solver: Solver) {
         val noCursorOperation = currentCalculation.operation.replaceFirst(CURSOR, "")
         if (noCursorOperation.isEmpty()) return
 
-        val newResult = currentCalculation.copy(operation = noCursorOperation, result = solver.solve(noCursorOperation))
+        val newResult = currentCalculation.copy(
+            operation = noCursorOperation,
+            result = solver.solve(noCursorOperation)
+        )
         calculations.add(0, newResult)
         currentCalculation = CalculationLine()
         cursorPosition = 0
@@ -183,7 +187,8 @@ class Editor(val solver: Solver) {
     }
 
     private fun copySelectionToWorkLine(fieldIndex: Int, stackIndex: Int) {
-        val value = if (fieldIndex == 0) calculations[stackIndex].operation else calculations[stackIndex].result
+        val value =
+            if (fieldIndex == 0) calculations[stackIndex].operation else calculations[stackIndex].result
         calculations[stackIndex] = calculations[stackIndex].copy(fieldSelected = -1)
         currentCalculation = currentCalculation.copy(
             operation = currentCalculation.operation.replaceFirst(
