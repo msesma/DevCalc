@@ -22,6 +22,7 @@ class Editor(val solver: Solver) {
     private var fieldSelected: Pair<Int, Int>? = null
 
     val calculationsState = mutableStateOf(listOf(currentCalculation))
+    val errorState = mutableStateOf("")
 
     fun onKeyClicked(keyCode: Int) {
         val keyValue = getKeyValue(keyCode)

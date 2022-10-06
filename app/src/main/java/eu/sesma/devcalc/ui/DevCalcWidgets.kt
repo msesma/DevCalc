@@ -1,5 +1,6 @@
 package eu.sesma.devcalc
 
+import android.annotation.SuppressLint
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -15,6 +16,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
@@ -28,14 +31,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import eu.sesma.devcalc.editor.CalculationLine
 import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.DIV
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.SUB
-import eu.sesma.devcalc.editor.CalculationLine
 import eu.sesma.devcalc.ui.CursorTransformation
 import eu.sesma.devcalc.ui.theme.DevCalcTheme
 import eu.sesma.devcalc.ui.theme.LcdColor
+import eu.sesma.devcalc.ui.theme.WhiteTransparent
 
 @Composable
 fun Key(
@@ -87,7 +91,7 @@ fun PinButtonPreview() {
 }
 
 @Composable
-fun PinPanel(
+fun KeyPanel(
     modifier: Modifier = Modifier,
     onClick: (Int) -> Unit = {},
 ) {
@@ -151,9 +155,9 @@ fun PinPanel(
 
 @Preview
 @Composable
-fun PinPanelPreview() {
+fun KeyPanelPreview() {
     DevCalcTheme {
-        PinPanel()
+        KeyPanel()
     }
 }
 
@@ -174,7 +178,7 @@ fun ScreenItem(
         modifier = modifier
             .wrapContentHeight()
             .fillMaxWidth()
-            .background(color = if(lineIndex==0) Color.White else Color.Unspecified)
+            .background(color = if (lineIndex == 0) WhiteTransparent else Color.Unspecified)
     ) {
         Row(
             modifier = Modifier
@@ -194,7 +198,7 @@ fun ScreenItem(
                             reverseScrolling = lineIndex == 0
                         )
                         .clickable { onClick(lineIndex, 0) }
-                        .then( Modifier.background(if (calculationLine.fieldSelected == 0) Color.Cyan else Color.Unspecified)),
+                        .then(Modifier.background(if (calculationLine.fieldSelected == 0) Color.Cyan else Color.Unspecified)),
                     value = calculationLine.operation,
                     textStyle = LocalTextStyle.current,
                     onValueChange = { },
@@ -215,7 +219,7 @@ fun ScreenItem(
                     modifier = Modifier
                         .padding(end = 4.dp)
                         .clickable { onClick(lineIndex, 1) }
-                        .then( Modifier.background(if (calculationLine.fieldSelected == 1) Color.Cyan else Color.Unspecified)),
+                        .then(Modifier.background(if (calculationLine.fieldSelected == 1) Color.Cyan else Color.Unspecified)),
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End),
                     value = calculationLine.result,
                     onValueChange = {},
@@ -240,7 +244,7 @@ fun ScreenItem(
                         reverseScrolling = false
                     )
                     .clickable { onClick(lineIndex, 1) }
-                    .then( Modifier.background(if (calculationLine.fieldSelected == 1) Color.Cyan else Color.Transparent)),
+                    .then(Modifier.background(if (calculationLine.fieldSelected == 1) Color.Cyan else Color.Transparent)),
                 textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End),
                 value = calculationLine.result,
                 onValueChange = {},
@@ -265,34 +269,77 @@ fun ScreenItemPreviewShort() {
 }
 
 @Composable
-fun ScreenList(
+fun Indicators(
+    modifier: Modifier = Modifier,
+    errorText: String,
+) {
+    Row(
+        modifier
+            .fillMaxWidth()
+            .height(16.dp)
+            .background(color = WhiteTransparent)
+            .drawBehind {
+                val y = size.height - 1
+                drawLine(color = Color.DarkGray, start = Offset(0f, y), end = Offset(size.width, y))
+            },
+        horizontalArrangement = Arrangement.SpaceAround
+    ) {
+        Text(
+            modifier = Modifier.padding(bottom = 1.dp),
+            text = errorText,
+            color = Color.Red,
+            style = MaterialTheme.typography.caption,
+            fontWeight = FontWeight.Medium,
+        )
+    }
+}
+
+@Preview(device = Devices.PIXEL_3_XL)
+@Composable
+fun IndicatorsPreview() {
+    DevCalcTheme {
+        Indicators(errorText = "Syntax error")
+    }
+}
+
+@Composable
+fun Screen(
     modifier: Modifier = Modifier,
     calculations: List<CalculationLine>,
+    errorText: String,
     onClick: (Int, Int) -> Unit
 ) {
-    val scrollState = rememberLazyListState()
-    LazyColumn(
+    Column(
         modifier = modifier
             .padding(top = 32.dp, start = 32.dp, end = 32.dp)
             .fillMaxWidth()
             .height(240.dp)
-            .animateContentSize()
             .border(width = 1.dp, color = MaterialTheme.colors.onBackground)
             .background(color = LcdColor),
-        state = scrollState,
-        reverseLayout = true,
     ) {
-        itemsIndexed(calculations) { index, calculation ->
-            ScreenItem(calculationLine = calculation, lineIndex = index, onClick = onClick)
-            Divider(thickness = 1.dp, color = Color.DarkGray)
+        val scrollState = rememberLazyListState()
+        Indicators(errorText = errorText)
+        LazyColumn(
+            modifier = modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .animateContentSize(),
+            state = scrollState,
+            reverseLayout = true,
+        ) {
+            itemsIndexed(calculations) { index, calculation ->
+                ScreenItem(calculationLine = calculation, lineIndex = index, onClick = onClick)
+                Divider(thickness = 1.dp, color = Color.DarkGray)
+            }
         }
     }
 }
 
 @Composable
 fun CalcComposeView(
-    modifier: Modifier = Modifier.fillMaxSize(),
-    calculations: MutableState<List<CalculationLine>>,
+    modifier: Modifier = Modifier,
+    errorState: MutableState<String>,
+    calculationsState: MutableState<List<CalculationLine>>,
     onKeyClick: (Int) -> Unit,
     onScreenClick: (Int, Int) -> Unit,
 ) {
@@ -301,23 +348,26 @@ fun CalcComposeView(
     ) {
         Column(
             modifier = modifier
+                .fillMaxSize()
                 .background(color = MaterialTheme.colors.background)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ScreenList(calculations = calculations.value, onClick = onScreenClick)
+            Screen(calculations = calculationsState.value, errorText = errorState.value, onClick = onScreenClick)
             Surface(modifier = Modifier.weight(1f)) {}
-            PinPanel(modifier = Modifier.padding(bottom = 32.dp), onClick = onKeyClick)
+            KeyPanel(modifier = Modifier.padding(bottom = 32.dp), onClick = onKeyClick)
         }
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Preview(device = Devices.PIXEL_3_XL)
 @Composable
 fun CalcComposeViewPreview() {
     DevCalcTheme {
         CalcComposeView(
-            calculations = mutableStateOf(
+            errorState = mutableStateOf("Syntax Error"),
+            calculationsState = mutableStateOf(
                 listOf(
                     CalculationLine(operation = "125+500", result = "625"),
                     CalculationLine(operation = "25669882/5566", result = "2255")
