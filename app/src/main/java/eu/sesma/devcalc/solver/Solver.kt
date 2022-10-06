@@ -29,7 +29,7 @@ class Solver {
         return Success(result = calculation.operands[0])
     }
 
-    @VisibleForTesting()
+    @VisibleForTesting
     internal fun getOperands(operationText: String): List<Double?> {
         val operandStrings = operationText.split(ADD, SUB, MUL, DIV)
         return operandStrings.map {

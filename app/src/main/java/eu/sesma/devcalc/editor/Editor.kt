@@ -4,7 +4,6 @@ import androidx.compose.runtime.mutableStateOf
 import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.CURSOR
 import eu.sesma.devcalc.editor.Constants.DIV
-import eu.sesma.devcalc.editor.Constants.DIVIDE_BY_ZERO
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.editor.Constants.SYNTAX_ERROR
@@ -126,7 +125,6 @@ class Editor(val solver: Solver) {
         when (val calculationResult = solver.solve(noCursorOperation)) {
             is Success -> onSuccessResult(noCursorOperation, calculationResult.result.toString())
             is SyntaxError -> onSyntaxErrorResult(calculationResult.cursorPosition)
-            is DivideByZero -> onDivideByZeroResult(calculationResult.cursorPosition)
         }
     }
 
@@ -144,12 +142,6 @@ class Editor(val solver: Solver) {
         this.cursorPosition = cursorPosition
         addCursor()
         errorState.value = SYNTAX_ERROR
-    }
-
-    private fun onDivideByZeroResult(cursorPosition: Int) {
-        this.cursorPosition = cursorPosition
-        addCursor()
-        errorState.value = DIVIDE_BY_ZERO
     }
 
     private fun executeActionAnswer() {
