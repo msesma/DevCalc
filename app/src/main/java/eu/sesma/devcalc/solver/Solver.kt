@@ -6,12 +6,19 @@ import eu.sesma.devcalc.editor.Constants.DIV
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.OPERANDS
 import eu.sesma.devcalc.editor.Constants.SUB
+import eu.sesma.devcalc.solver.CalculationResult.Success
+import eu.sesma.devcalc.solver.CalculationResult.SyntaxError
 
 class Solver {
 
     fun solve(operationText: String): CalculationResult {
+        val operands = getOperands(operationText)
+        val errorIndex = operands.indexOf(null)
+        if (errorIndex != -1) return SyntaxError(cursorPosition = getSyntaxErrorPosition(operationText, errorIndex))
+
+        @Suppress("UNCHECKED_CAST")
         var calculation = Calculation(
-            operands = getOperands(operationText),
+            operands = operands as List<Double>,
             operators = getOperators(operationText)
         )
 
@@ -19,13 +26,19 @@ class Solver {
             calculation = processOperand(calculation, currentOperand)
         }
 
-        return CalculationResult.Success(result = calculation.operands[0])
+        return Success(result = calculation.operands[0])
     }
 
     @VisibleForTesting()
-    internal fun getOperands(operationText: String): List<Double> {
+    internal fun getOperands(operationText: String): List<Double?> {
         val operandStrings = operationText.split(ADD, SUB, MUL, DIV)
-        return operandStrings.map { it.toDouble() }
+        return operandStrings.map {
+            try {
+                it.toDouble()
+            } catch (nfe: java.lang.NumberFormatException) {
+                null
+            }
+        }
     }
 
     @VisibleForTesting
@@ -63,5 +76,12 @@ class Solver {
             operatorPosition = tempCalculation.operators.indexOfFirst { it == operator }
         }
         return tempCalculation
+    }
+
+    private fun getSyntaxErrorPosition(operationText: String, errorIndex: Int): Int {
+        val operandStrings = operationText.split(ADD, SUB, MUL, DIV)
+        return (0 until errorIndex).fold(
+            initial = 0,
+            operation = { acc, i -> acc + operandStrings[i].length }) + errorIndex + operandStrings[errorIndex].length
     }
 }

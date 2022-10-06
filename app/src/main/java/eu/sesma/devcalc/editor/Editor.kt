@@ -1,6 +1,5 @@
 package eu.sesma.devcalc.editor
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.CURSOR
@@ -10,7 +9,6 @@ import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.editor.Constants.SYNTAX_ERROR
 import eu.sesma.devcalc.editor.Editor.Actions.*
-import eu.sesma.devcalc.solver.CalculationResult
 import eu.sesma.devcalc.solver.CalculationResult.*
 import eu.sesma.devcalc.solver.Solver
 
@@ -29,6 +27,7 @@ class Editor(val solver: Solver) {
     val errorState = mutableStateOf("")
 
     fun onKeyClicked(keyCode: Int) {
+        errorState.value = ""
         val keyValue = getKeyValue(keyCode)
         val keyAction = getKeyAction(keyCode)
 
@@ -43,7 +42,6 @@ class Editor(val solver: Solver) {
             FORTH -> executeActionForth()
         }
 
-        errorState.value = ""
         updateScreen()
     }
 
@@ -156,7 +154,6 @@ class Editor(val solver: Solver) {
 
     private fun executeActionAnswer() {
         if (calculations.isEmpty()) return
-        Log.d("==>", "pre ans cursorPosition = $cursorPosition")
         val value = calculations[0].result
         currentCalculation = currentCalculation.copy(
             operation = currentCalculation.operation.replaceFirst(
@@ -165,7 +162,6 @@ class Editor(val solver: Solver) {
             )
         )
         cursorPosition += value.length
-        Log.d("==>", "post ans cursorPosition = $cursorPosition")
     }
 
     private fun executeActionBack() {
