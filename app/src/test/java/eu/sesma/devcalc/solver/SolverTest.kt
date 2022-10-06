@@ -54,10 +54,10 @@ class SolverTest {
     @Test
     fun `solve operation`() {
         val operationText = "2+3×4÷6−2×3+9"
-        val expectedResult = "7.0"
+        val expectedResult = 7.0
 
         val result = solver.solve(operationText)
 
-        assertEquals (expectedResult, result)
+        assertEquals (expectedResult, (result as CalculationResult.Success).result, 0.0)
     }
 }

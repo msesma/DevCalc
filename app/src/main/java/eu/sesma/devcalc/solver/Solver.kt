@@ -9,7 +9,7 @@ import eu.sesma.devcalc.editor.Constants.SUB
 
 class Solver {
 
-    fun solve(operationText: String): String {
+    fun solve(operationText: String): CalculationResult {
         var calculation = Calculation(
             operands = getOperands(operationText),
             operators = getOperators(operationText)
@@ -19,7 +19,7 @@ class Solver {
             calculation = processOperand(calculation, currentOperand)
         }
 
-        return calculation.operands[0].toString()
+        return CalculationResult.Success(result = calculation.operands[0])
     }
 
     @VisibleForTesting()

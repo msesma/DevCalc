@@ -5,10 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.CURSOR
 import eu.sesma.devcalc.editor.Constants.DIV
+import eu.sesma.devcalc.editor.Constants.DIVIDE_BY_ZERO
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.SUB
-import eu.sesma.devcalc.solver.Solver
+import eu.sesma.devcalc.editor.Constants.SYNTAX_ERROR
 import eu.sesma.devcalc.editor.Editor.Actions.*
+import eu.sesma.devcalc.solver.CalculationResult
+import eu.sesma.devcalc.solver.CalculationResult.*
+import eu.sesma.devcalc.solver.Solver
 
 class Editor(val solver: Solver) {
 
@@ -22,6 +26,7 @@ class Editor(val solver: Solver) {
     private var fieldSelected: Pair<Int, Int>? = null
 
     val calculationsState = mutableStateOf(listOf(currentCalculation))
+    val errorState = mutableStateOf("")
 
     fun onKeyClicked(keyCode: Int) {
         val keyValue = getKeyValue(keyCode)
@@ -38,6 +43,7 @@ class Editor(val solver: Solver) {
             FORTH -> executeActionForth()
         }
 
+        errorState.value = ""
         updateScreen()
     }
 
@@ -119,13 +125,33 @@ class Editor(val solver: Solver) {
         val noCursorOperation = currentCalculation.operation.replaceFirst(CURSOR, "")
         if (noCursorOperation.isEmpty()) return
 
+        when (val calculationResult = solver.solve(noCursorOperation)) {
+            is Success -> onSuccessResult(noCursorOperation, calculationResult.result.toString())
+            is SyntaxError -> onSyntaxErrorResult(calculationResult.cursorPosition)
+            is DivideByZero -> onDivideByZeroResult(calculationResult.cursorPosition)
+        }
+    }
+
+    private fun onSuccessResult(noCursorOperation: String, successResult: String) {
         val newResult = currentCalculation.copy(
             operation = noCursorOperation,
-            result = solver.solve(noCursorOperation)
+            result = successResult
         )
         calculations.add(0, newResult)
         currentCalculation = CalculationLine()
         cursorPosition = 0
+    }
+
+    private fun onSyntaxErrorResult(cursorPosition: Int) {
+        this.cursorPosition = cursorPosition
+        addCursor()
+        errorState.value = SYNTAX_ERROR
+    }
+
+    private fun onDivideByZeroResult(cursorPosition: Int) {
+        this.cursorPosition = cursorPosition
+        addCursor()
+        errorState.value = DIVIDE_BY_ZERO
     }
 
     private fun executeActionAnswer() {

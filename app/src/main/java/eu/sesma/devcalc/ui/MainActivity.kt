@@ -3,6 +3,7 @@ package eu.sesma.devcalc.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.mutableStateOf
 import eu.sesma.devcalc.CalcComposeView
 import eu.sesma.devcalc.editor.Editor
 import eu.sesma.devcalc.solver.Solver
@@ -18,7 +19,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             DevCalcTheme {
                 CalcComposeView(
-                    calculations = editor.calculationsState,
+                    errorState= editor.errorState,
+                    calculationsState = editor.calculationsState,
                     onKeyClick = editor::onKeyClicked,
                     onScreenClick = editor::onScreenClicked
                 )

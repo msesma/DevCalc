@@ -10,4 +10,7 @@ object Constants {
     const val PLM = "±"
 
     const val OPERANDS = ADD + SUB + MUL + DIV
+
+    const val SYNTAX_ERROR = "Syntax error"
+    const val DIVIDE_BY_ZERO = "Divide by zero"
 }
