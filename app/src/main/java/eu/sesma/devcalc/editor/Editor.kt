@@ -8,7 +8,8 @@ import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.editor.Constants.SYNTAX_ERROR
 import eu.sesma.devcalc.editor.Editor.Actions.*
-import eu.sesma.devcalc.solver.CalculationResult.*
+import eu.sesma.devcalc.solver.CalculationResult.Success
+import eu.sesma.devcalc.solver.CalculationResult.SyntaxError
 import eu.sesma.devcalc.solver.Solver
 
 class Editor(val solver: Solver) {
@@ -58,6 +59,14 @@ class Editor(val solver: Solver) {
             calculations[stackIndex] = calculations[stackIndex].copy(fieldSelected = fieldIndex)
         else copySelectionToWorkLine(fieldIndex, stackIndex)
 
+        updateScreen()
+    }
+
+    fun restoreState(calcState: List<CalculationLine>) {
+        if (calcState.isEmpty()) return
+        currentCalculation = calcState[0]
+        cursorPosition = currentCalculation.operation.length - 1
+        calculations = calcState.drop(1).toMutableList()
         updateScreen()
     }
 

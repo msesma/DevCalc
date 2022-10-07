@@ -69,3 +69,9 @@
 # Fix a bug in R8
 # https://github.com/material-components/material-components-android/issues/1814
 -keep class com.google.android.material.snackbar.** { *; }
+
+
+#protocol buffers
+-keepclassmembers class * extends androidx.datastore.preferences.protobuf.GeneratedMessageLite {
+    <fields>;
+}

@@ -1,9 +1,12 @@
+import com.google.protobuf.gradle.generateProtoTasks
+import com.google.protobuf.gradle.protoc
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.protobuf").version("0.8.19")
 }
 
 val compose_ui_version = "1.2.1"
@@ -67,6 +70,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = compose_compiler_version
     }
+
 }
 
 tasks.withType<KotlinCompile> {
@@ -74,9 +78,26 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 }
 
+protobuf {
+    protobuf.protoc {
+        artifact = "com.google.protobuf:protoc:3.21.2"
+    }
+    protobuf.generateProtoTasks {
+        all().forEach { task ->
+            task.plugins {
+                create("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.activity:activity-compose:1.5.1")
+    implementation("androidx.activity:activity-compose:1.6.0")
+    implementation("androidx.datastore:datastore:1.0.0")
+    implementation("com.google.protobuf:protobuf-javalite:3.21.2")
 
     implementation("androidx.compose.ui:ui:$compose_ui_version")
     implementation("androidx.compose.ui:ui-tooling-preview:$compose_ui_version")

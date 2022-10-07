@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "eu.sesma.devcalc";
+option java_multiple_files = true;
+
+message CalcState {
+  message LineState {
+    string operation = 1;
+    string result = 2;
+  }
+  repeated LineState calcState = 1;
+}
