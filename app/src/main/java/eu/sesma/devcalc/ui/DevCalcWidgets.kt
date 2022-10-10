@@ -327,11 +327,21 @@ fun Screen(
             state = scrollState,
             reverseLayout = true,
         ) {
-            itemsIndexed(calculations) { index, calculation ->
-                ScreenItem(calculationLine = calculation, lineIndex = index, onClick = onClick)
-                Divider(thickness = 1.dp, color = Color.DarkGray)
+            itemsIndexed(calculations.drop(1)) { index, calculation ->
+                ScreenItem(calculationLine = calculation, lineIndex = index + 1, onClick = onClick)
+                Divider(thickness = 1.dp, color = Color.LightGray)
             }
         }
+        Surface(
+            modifier = Modifier.fillMaxWidth().height(1.dp),
+            color = Color.DarkGray
+        ) {}
+        ScreenItem(
+            modifier = Modifier.fillMaxWidth(),
+            calculationLine = calculations[0],
+            lineIndex = 0,
+            onClick = onClick
+        )
     }
 }
 
