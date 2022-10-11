@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
@@ -40,6 +41,7 @@ import eu.sesma.devcalc.ui.CursorTransformation
 import eu.sesma.devcalc.ui.theme.DevCalcTheme
 import eu.sesma.devcalc.ui.theme.LcdColor
 import eu.sesma.devcalc.ui.theme.WhiteTransparent
+import kotlinx.coroutines.launch
 
 @Composable
 fun Key(
@@ -207,7 +209,7 @@ fun ScreenItem(
                     visualTransformation = CursorTransformation(),
                     enabled = false,
                     onTextLayout = {
-                        calculationWidth = it.size.width
+                        calculationWidth = (it.size.width * 1.05).toInt()
                         doubleLine = calculationWidth + resultWidth > maxWidth && calculationLine.result.isNotEmpty()
                     })
             }
@@ -307,6 +309,7 @@ fun Screen(
     modifier: Modifier = Modifier,
     calculations: List<CalculationLine>,
     errorText: String,
+    scrollState: LazyListState,
     onClick: (Int, Int) -> Unit
 ) {
     Column(
@@ -317,7 +320,6 @@ fun Screen(
             .border(width = 1.dp, color = MaterialTheme.colors.onBackground)
             .background(color = LcdColor),
     ) {
-        val scrollState = rememberLazyListState()
         Indicators(errorText = errorText)
         LazyColumn(
             modifier = modifier
@@ -333,7 +335,9 @@ fun Screen(
             }
         }
         Surface(
-            modifier = Modifier.fillMaxWidth().height(1.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp),
             color = Color.DarkGray
         ) {}
         ScreenItem(
@@ -363,9 +367,22 @@ fun CalcComposeView(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Screen(calculations = calculationsState.value, errorText = errorState.value, onClick = onScreenClick)
+            val coroutineScope = rememberCoroutineScope()
+            val scrollState = rememberLazyListState()
+            Screen(
+                calculations = calculationsState.value,
+                errorText = errorState.value,
+                scrollState = scrollState,
+                onClick = onScreenClick
+            )
             Surface(modifier = Modifier.weight(1f)) {}
-            KeyPanel(modifier = Modifier.padding(bottom = 32.dp), onClick = onKeyClick)
+            KeyPanel(
+                modifier = Modifier.padding(bottom = 32.dp),
+                onClick = { keyCode ->
+                    coroutineScope.launch { scrollState.animateScrollToItem(0, 0) }
+                    onKeyClick(keyCode)
+                }
+            )
         }
     }
 }
