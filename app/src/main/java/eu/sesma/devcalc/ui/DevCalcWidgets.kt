@@ -1,7 +1,6 @@
-package eu.sesma.devcalc
+package eu.sesma.devcalc.ui
 
 import android.annotation.SuppressLint
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.keyframes
@@ -17,6 +16,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalTextInputService
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -37,18 +36,16 @@ import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.DIV
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.SUB
-import eu.sesma.devcalc.ui.CursorTransformation
-import eu.sesma.devcalc.ui.theme.DevCalcTheme
-import eu.sesma.devcalc.ui.theme.LcdColor
-import eu.sesma.devcalc.ui.theme.WhiteTransparent
+import eu.sesma.devcalc.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
 fun Key(
     modifier: Modifier = Modifier,
     keyCode: Int,
-    @DrawableRes icon: Int? = null,
+    special: Boolean = false,
     text: String = "",
+    secondaryText: String = "",
     onClick: (Int) -> Unit,
 ) {
     Button(
@@ -64,21 +61,43 @@ fun Key(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .clip(shape = MaterialTheme.shapes.medium)
                 .background(MaterialTheme.colors.surface)
-        ) {
-            if (icon != null) Icon(
+                .border(width = 1.dp, color = KeyGrey),
+
+            ) {
+            Text(
+                modifier = modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .height(44.dp)
+                    .background(color = if (special) Color.Blue else KeyGrey),
+                text = text,
+                textAlign = TextAlign.Center,
+                style = if (special) MaterialTheme.typography.h6 else MaterialTheme.typography.h5,
+                fontWeight = if (special) FontWeight.Normal else FontWeight.Bold,
+                color = if (special) Color.White else MaterialTheme.colors.onSurface
+            )
+            Surface(
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .semantics { testTag = "delete_button" },
-                painter = painterResource(icon),
-                tint = MaterialTheme.colors.onSurface,
-                contentDescription = ""
-            ) else Text(
-                modifier = modifier.align(Alignment.Center),
-                text = text,
-                style = MaterialTheme.typography.h5,
+                    .fillMaxWidth()
+                    .padding(top = 14.dp)
+                    .height(4.dp),
+                color = Color.LightGray
+            ) {}
+            Text(
+                modifier = modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(20.dp)
+                    .padding(bottom = 2.dp)
+                    .background(color = KeyGreyAngle),
+                text = secondaryText,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.body2,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colors.onSurface
+                color = Color.Blue
             )
         }
     }
@@ -106,12 +125,16 @@ fun KeyPanel(
             modifier = Modifier.width(width),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Key(keyCode = 20, onClick = onClick, text = "Esc")
+            Key(keyCode = 20, onClick = onClick, text = "Esc", secondaryText = "Clear")
             Key(keyCode = 21, onClick = onClick, text = "Del")
-            Key(keyCode = 22, onClick = onClick, text = "<-")
-            Key(keyCode = 23, onClick = onClick, text = "->")
-            Key(keyCode = 24, onClick = onClick, text = "")
+            Key(keyCode = 22, onClick = onClick, text = "<-" , secondaryText = "|<-")
+            Key(keyCode = 23, onClick = onClick, text = "->", secondaryText = "->|")
+            Key(keyCode = 24, onClick = onClick, text = "Shift", special = true)
         }
+
+//        ➜
+
+
         Row(
             modifier = Modifier.width(width),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -120,7 +143,7 @@ fun KeyPanel(
             Key(keyCode = 16, onClick = onClick, text = "8")
             Key(keyCode = 17, onClick = onClick, text = "9")
             Key(keyCode = 18, onClick = onClick, text = DIV)
-            Key(keyCode = 19, onClick = onClick, text = "")
+            Key(keyCode = 19, onClick = onClick)
         }
         Row(
             modifier = Modifier.width(width),
@@ -130,7 +153,7 @@ fun KeyPanel(
             Key(keyCode = 11, onClick = onClick, text = "5")
             Key(keyCode = 12, onClick = onClick, text = "6")
             Key(keyCode = 13, onClick = onClick, text = MUL)
-            Key(keyCode = 14, onClick = onClick, text = "")
+            Key(keyCode = 14, onClick = onClick)
         }
         Row(
             modifier = Modifier.width(width),
@@ -138,9 +161,9 @@ fun KeyPanel(
         ) {
             Key(keyCode = 5, onClick = onClick, text = "1")
             Key(keyCode = 6, onClick = onClick, text = "2")
-            Key(keyCode = 7, onClick = onClick, text = "3")
-            Key(keyCode = 8, onClick = onClick, text = SUB)
-            Key(keyCode = 9, onClick = onClick, text = "")
+            Key(keyCode = 7, onClick = onClick, text = "3", secondaryText = "π")
+            Key(keyCode = 8, onClick = onClick, text = SUB, secondaryText = "±")
+            Key(keyCode = 9, onClick = onClick)
         }
         Row(
             modifier = Modifier.width(width),

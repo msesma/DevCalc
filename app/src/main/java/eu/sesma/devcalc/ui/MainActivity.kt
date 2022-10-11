@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
-import eu.sesma.devcalc.CalcComposeView
 import eu.sesma.devcalc.CalcState.LineState
 import eu.sesma.devcalc.editor.CalculationLine
 import eu.sesma.devcalc.editor.Editor
