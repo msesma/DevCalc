@@ -36,6 +36,7 @@ import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.DIV
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.SUB
+import eu.sesma.devcalc.editor.NotificationsLine
 import eu.sesma.devcalc.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -127,14 +128,10 @@ fun KeyPanel(
         ) {
             Key(keyCode = 20, onClick = onClick, text = "Esc", secondaryText = "Clear")
             Key(keyCode = 21, onClick = onClick, text = "Del")
-            Key(keyCode = 22, onClick = onClick, text = "<-" , secondaryText = "|<-")
+            Key(keyCode = 22, onClick = onClick, text = "<-", secondaryText = "|<-")
             Key(keyCode = 23, onClick = onClick, text = "->", secondaryText = "->|")
             Key(keyCode = 24, onClick = onClick, text = "Shift", shift = true)
         }
-
-//        ➜
-
-
         Row(
             modifier = Modifier.width(width),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -296,7 +293,7 @@ fun ScreenItemPreviewShort() {
 @Composable
 fun Indicators(
     modifier: Modifier = Modifier,
-    errorText: String,
+    notifications: NotificationsLine,
 ) {
     Row(
         modifier
@@ -307,12 +304,19 @@ fun Indicators(
                 val y = size.height - 1
                 drawLine(color = Color.DarkGray, start = Offset(0f, y), end = Offset(size.width, y))
             },
-        horizontalArrangement = Arrangement.SpaceAround
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             modifier = Modifier.padding(bottom = 1.dp),
-            text = errorText,
+            text = notifications.error,
             color = Color.Red,
+            style = MaterialTheme.typography.caption,
+            fontWeight = FontWeight.Medium,
+        )
+        Text(
+            modifier = Modifier.padding(bottom = 1.dp, end = 8.dp),
+            text = if (notifications.shifted) "Shift" else "",
+            color = Color.Blue,
             style = MaterialTheme.typography.caption,
             fontWeight = FontWeight.Medium,
         )
@@ -323,7 +327,7 @@ fun Indicators(
 @Composable
 fun IndicatorsPreview() {
     DevCalcTheme {
-        Indicators(errorText = "Syntax error")
+        Indicators(notifications = NotificationsLine(error = "Syntax Error"))
     }
 }
 
@@ -331,7 +335,7 @@ fun IndicatorsPreview() {
 fun Screen(
     modifier: Modifier = Modifier,
     calculations: List<CalculationLine>,
-    errorText: String,
+    notifications: NotificationsLine,
     scrollState: LazyListState,
     onClick: (Int, Int) -> Unit
 ) {
@@ -343,7 +347,7 @@ fun Screen(
             .border(width = 1.dp, color = MaterialTheme.colors.onBackground)
             .background(color = LcdColor),
     ) {
-        Indicators(errorText = errorText)
+        Indicators(notifications = notifications)
         LazyColumn(
             modifier = modifier
                 .fillMaxWidth()
@@ -375,7 +379,7 @@ fun Screen(
 @Composable
 fun CalcComposeView(
     modifier: Modifier = Modifier,
-    errorState: MutableState<String>,
+    notificationsState: MutableState<NotificationsLine>,
     calculationsState: MutableState<List<CalculationLine>>,
     onKeyClick: (Int) -> Unit,
     onScreenClick: (Int, Int) -> Unit,
@@ -394,7 +398,7 @@ fun CalcComposeView(
             val scrollState = rememberLazyListState()
             Screen(
                 calculations = calculationsState.value,
-                errorText = errorState.value,
+                notifications = notificationsState.value,
                 scrollState = scrollState,
                 onClick = onScreenClick
             )
@@ -416,7 +420,7 @@ fun CalcComposeView(
 fun CalcComposeViewPreview() {
     DevCalcTheme {
         CalcComposeView(
-            errorState = mutableStateOf("Syntax Error"),
+            notificationsState = mutableStateOf(NotificationsLine(error = "Syntax Error")),
             calculationsState = mutableStateOf(
                 listOf(
                     CalculationLine(operation = "125+500", result = "625"),

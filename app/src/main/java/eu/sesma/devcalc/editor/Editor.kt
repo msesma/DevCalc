@@ -15,7 +15,7 @@ import eu.sesma.devcalc.solver.Solver
 class Editor(val solver: Solver) {
 
     enum class Actions {
-        ANSWER, ENTER, ESC, CLEAR, DELETE, BACK, FORTH
+        ANSWER, ENTER, ESC, CLEAR, DELETE, BACK, START, FORTH, END
     }
 
     private var currentCalculation = CalculationLine()
@@ -24,21 +24,21 @@ class Editor(val solver: Solver) {
     private var fieldSelected: Pair<Int, Int>? = null
 
     val calculationsState = mutableStateOf(listOf(currentCalculation))
-    val errorState = mutableStateOf("")
-    val shiftState = mutableStateOf(false)
+    val notificationsState = mutableStateOf(NotificationsLine())
+//    val shiftState = mutableStateOf(false)
 
     fun onKeyClicked(keyCode: Int) {
-        errorState.value = ""
+        notificationsState.value = notificationsState.value.copy(error = "")
 
         if (keyCode == 24) {
-            shiftState.value = !shiftState.value
+            notificationsState.value = notificationsState.value.copy(shifted = !notificationsState.value.shifted)
             return
         }
 
-        val keyValue = getKeyValue(keyCode, shiftState.value)
-        val keyAction = getKeyAction(keyCode, shiftState.value)
+        val keyValue = getKeyValue(keyCode, notificationsState.value.shifted)
+        val keyAction = getKeyAction(keyCode, notificationsState.value.shifted)
 
-        shiftState.value = false
+        notificationsState.value = notificationsState.value.copy(shifted = false)
 
         if (keyValue != null) processKeyValue(keyValue)
 
@@ -49,7 +49,9 @@ class Editor(val solver: Solver) {
             ENTER -> executeActionEnter()
             ANSWER -> executeActionAnswer()
             BACK -> executeActionBack()
+            START -> executeActionBack(start = true)
             FORTH -> executeActionForth()
+            END -> executeActionForth(end = true)
         }
 
         updateScreen()
@@ -104,8 +106,8 @@ class Editor(val solver: Solver) {
         4 -> ENTER
         20 -> if (shifted) CLEAR else ESC
         21 -> DELETE
-        22 -> BACK
-        23 -> FORTH
+        22 -> if (shifted) START else BACK
+        23 -> if (shifted) END else FORTH
         else -> null
     }
 
@@ -167,7 +169,7 @@ class Editor(val solver: Solver) {
     private fun onSyntaxErrorResult(cursorPosition: Int) {
         this.cursorPosition = cursorPosition
         addCursor()
-        errorState.value = SYNTAX_ERROR
+        notificationsState.value = notificationsState.value.copy(error = SYNTAX_ERROR)
     }
 
     private fun executeActionAnswer() {
@@ -182,16 +184,16 @@ class Editor(val solver: Solver) {
         cursorPosition += value.length
     }
 
-    private fun executeActionBack() {
+    private fun executeActionBack(start: Boolean = false) {
         if (cursorPosition > 0) {
-            cursorPosition--
+            cursorPosition = if (start) 0 else cursorPosition - 1
             addCursor()
         }
     }
 
-    private fun executeActionForth() {
+    private fun executeActionForth(end: Boolean = false) {
         if (cursorPosition < currentCalculation.operation.length - 1) {
-            cursorPosition++
+            cursorPosition = if (end) currentCalculation.operation.length - 1 else cursorPosition + 1
             addCursor()
         }
     }

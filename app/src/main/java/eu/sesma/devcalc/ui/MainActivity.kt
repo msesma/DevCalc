@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             DevCalcTheme {
                 CalcComposeView(
-                    errorState = editor.errorState,
+                    notificationsState = editor.notificationsState,
                     calculationsState = editor.calculationsState,
                     onKeyClick = ::onKeyClicked,
                     onScreenClick = editor::onScreenClicked
