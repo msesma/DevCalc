@@ -15,7 +15,7 @@ import eu.sesma.devcalc.solver.Solver
 class Editor(val solver: Solver) {
 
     enum class Actions {
-        ANSWER, ENTER, ESC, DELETE, BACK, FORTH
+        ANSWER, ENTER, ESC, CLEAR, DELETE, BACK, FORTH
     }
 
     private var currentCalculation = CalculationLine()
@@ -25,16 +25,26 @@ class Editor(val solver: Solver) {
 
     val calculationsState = mutableStateOf(listOf(currentCalculation))
     val errorState = mutableStateOf("")
+    val shiftState = mutableStateOf(false)
 
     fun onKeyClicked(keyCode: Int) {
         errorState.value = ""
-        val keyValue = getKeyValue(keyCode)
-        val keyAction = getKeyAction(keyCode)
+
+        if (keyCode == 24) {
+            shiftState.value = !shiftState.value
+            return
+        }
+
+        val keyValue = getKeyValue(keyCode, shiftState.value)
+        val keyAction = getKeyAction(keyCode, shiftState.value)
+
+        shiftState.value = false
 
         if (keyValue != null) processKeyValue(keyValue)
 
         if (keyAction != null) when (keyAction) {
             ESC -> executeActionEsc()
+            CLEAR -> executeActionClear()
             DELETE -> executeActionDelete()
             ENTER -> executeActionEnter()
             ANSWER -> executeActionAnswer()
@@ -70,7 +80,7 @@ class Editor(val solver: Solver) {
         updateScreen()
     }
 
-    private fun getKeyValue(keyCode: Int) = when (keyCode) {
+    private fun getKeyValue(keyCode: Int, shifted: Boolean) = when (keyCode) {
         0 -> "0"
         1 -> "."
         3 -> ADD
@@ -89,10 +99,10 @@ class Editor(val solver: Solver) {
         else -> null
     }
 
-    private fun getKeyAction(keyCode: Int) = when (keyCode) {
+    private fun getKeyAction(keyCode: Int, shifted: Boolean) = when (keyCode) {
         2 -> ANSWER
         4 -> ENTER
-        20 -> ESC
+        20 -> if (shifted) CLEAR else ESC
         21 -> DELETE
         22 -> BACK
         23 -> FORTH
@@ -117,6 +127,13 @@ class Editor(val solver: Solver) {
             currentCalculation = CalculationLine()
             cursorPosition = 0
         }
+    }
+
+    private fun executeActionClear() {
+        currentCalculation = CalculationLine()
+        calculations = mutableListOf()
+        cursorPosition = 0
+        updateScreen()
     }
 
     private fun executeActionDelete() {

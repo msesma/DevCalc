@@ -1,6 +1,8 @@
 package eu.sesma.devcalc.ui
 
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
+import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
@@ -27,6 +29,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    private val view
+        get() = window.decorView
+            .findViewById<ViewGroup>(android.R.id.content)
+            .getChildAt(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +41,7 @@ class MainActivity : ComponentActivity() {
                 CalcComposeView(
                     errorState = editor.errorState,
                     calculationsState = editor.calculationsState,
-                    onKeyClick = editor::onKeyClicked,
+                    onKeyClick = ::onKeyClicked,
                     onScreenClick = editor::onScreenClicked
                 )
             }
@@ -64,5 +70,10 @@ class MainActivity : ComponentActivity() {
             }
             builder.build()
         }
+    }
+
+    private fun onKeyClicked(keycode: Int){
+        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        editor.onKeyClicked(keycode)
     }
 }

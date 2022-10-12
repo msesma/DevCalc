@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 fun Key(
     modifier: Modifier = Modifier,
     keyCode: Int,
-    special: Boolean = false,
+    shift: Boolean = false,
     text: String = "",
     secondaryText: String = "",
     onClick: (Int) -> Unit,
@@ -71,12 +71,12 @@ fun Key(
                     .align(Alignment.TopCenter)
                     .fillMaxWidth()
                     .height(44.dp)
-                    .background(color = if (special) Color.Blue else KeyGrey),
+                    .background(color = if (shift) Color.Blue else KeyGrey),
                 text = text,
                 textAlign = TextAlign.Center,
-                style = if (special) MaterialTheme.typography.h6 else MaterialTheme.typography.h5,
-                fontWeight = if (special) FontWeight.Normal else FontWeight.Bold,
-                color = if (special) Color.White else MaterialTheme.colors.onSurface
+                style = if (shift) MaterialTheme.typography.h6 else MaterialTheme.typography.h5,
+                fontWeight = if (shift) FontWeight.Normal else FontWeight.Bold,
+                color = if (shift) Color.White else MaterialTheme.colors.onSurface
             )
             Surface(
                 modifier = Modifier
@@ -129,7 +129,7 @@ fun KeyPanel(
             Key(keyCode = 21, onClick = onClick, text = "Del")
             Key(keyCode = 22, onClick = onClick, text = "<-" , secondaryText = "|<-")
             Key(keyCode = 23, onClick = onClick, text = "->", secondaryText = "->|")
-            Key(keyCode = 24, onClick = onClick, text = "Shift", special = true)
+            Key(keyCode = 24, onClick = onClick, text = "Shift", shift = true)
         }
 
 //        ➜
