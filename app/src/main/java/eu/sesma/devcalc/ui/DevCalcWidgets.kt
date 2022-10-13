@@ -35,6 +35,7 @@ import eu.sesma.devcalc.editor.CalculationLine
 import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.DIV
 import eu.sesma.devcalc.editor.Constants.MUL
+import eu.sesma.devcalc.editor.Constants.PLM
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.editor.NotificationsLine
 import eu.sesma.devcalc.ui.theme.*
@@ -159,7 +160,7 @@ fun KeyPanel(
             Key(keyCode = 5, onClick = onClick, text = "1")
             Key(keyCode = 6, onClick = onClick, text = "2")
             Key(keyCode = 7, onClick = onClick, text = "3", secondaryText = "π")
-            Key(keyCode = 8, onClick = onClick, text = SUB, secondaryText = "±")
+            Key(keyCode = 8, onClick = onClick, text = SUB, secondaryText = PLM)
             Key(keyCode = 9, onClick = onClick)
         }
         Row(

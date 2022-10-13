@@ -6,7 +6,7 @@ object Constants {
     const val SUB = "−"
     const val MUL = "×"
     const val DIV = "÷"
-    const val NEG = "-"
+    const val MINUS = "-"
     const val PLM = "±"
 
     const val OPERANDS = ADD + SUB + MUL + DIV

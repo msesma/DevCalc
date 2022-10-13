@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.CURSOR
 import eu.sesma.devcalc.editor.Constants.DIV
+import eu.sesma.devcalc.editor.Constants.MINUS
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.editor.Constants.SYNTAX_ERROR
@@ -16,7 +17,7 @@ import kotlin.math.PI
 class Editor(val solver: Solver) {
 
     enum class Actions {
-        ANSWER, ENTER, ESC, CLEAR, DELETE, BACK, START, FORTH, END
+        ANSWER, ENTER, ESC, CLEAR, DELETE, BACK, START, FORTH, END, NEGATE
     }
 
     private var currentCalculation = CalculationLine()
@@ -52,6 +53,7 @@ class Editor(val solver: Solver) {
             START -> executeActionBack(start = true)
             FORTH -> executeActionForth()
             END -> executeActionForth(end = true)
+            NEGATE -> executeActionNegate()
         }
 
         updateScreen()
@@ -89,7 +91,7 @@ class Editor(val solver: Solver) {
         5 -> "1"
         6 -> "2"
         7 -> if (shifted) PI.toString() else "3"
-        8 -> SUB
+        8 -> if (shifted) null else SUB
         10 -> "4"
         11 -> "5"
         12 -> "6"
@@ -104,6 +106,7 @@ class Editor(val solver: Solver) {
     private fun getKeyAction(keyCode: Int, shifted: Boolean) = when (keyCode) {
         2 -> ANSWER
         4 -> ENTER
+        8 -> if (shifted) NEGATE else null
         20 -> if (shifted) CLEAR else ESC
         21 -> DELETE
         22 -> if (shifted) START else BACK
@@ -196,6 +199,22 @@ class Editor(val solver: Solver) {
             cursorPosition = if (end) currentCalculation.operation.length - 1 else cursorPosition + 1
             addCursor()
         }
+    }
+
+    private fun executeActionNegate() {
+        val currentOperand = currentCalculation.operation.split(ADD, SUB, MUL, DIV).first { it.contains(CURSOR) }
+        val currentOperandNoCursor = if (currentOperand[0].toString() == MINUS) {
+            cursorPosition--
+            currentOperand.removePrefix(MINUS)
+        } else {
+            cursorPosition++
+            MINUS + currentOperand
+        }
+        currentCalculation = CalculationLine(
+            operation = currentCalculation.operation.replaceFirst(currentOperand, currentOperandNoCursor)
+        )
+        addCursor()
+        updateScreen()
     }
 
     private fun updateScreen() {
