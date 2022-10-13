@@ -303,7 +303,8 @@ fun Indicators(
             .drawBehind {
                 val y = size.height - 1
                 drawLine(color = Color.DarkGray, start = Offset(0f, y), end = Offset(size.width, y))
-            },
+            }
+            .padding(start = 8.dp, end = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -314,7 +315,7 @@ fun Indicators(
             fontWeight = FontWeight.Medium,
         )
         Text(
-            modifier = Modifier.padding(bottom = 1.dp, end = 8.dp),
+            modifier = Modifier.padding(bottom = 1.dp),
             text = if (notifications.shifted) "Shift" else "",
             color = Color.Blue,
             style = MaterialTheme.typography.caption,

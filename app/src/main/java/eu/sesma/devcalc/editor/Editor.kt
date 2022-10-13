@@ -11,6 +11,7 @@ import eu.sesma.devcalc.editor.Editor.Actions.*
 import eu.sesma.devcalc.solver.CalculationResult.Success
 import eu.sesma.devcalc.solver.CalculationResult.SyntaxError
 import eu.sesma.devcalc.solver.Solver
+import kotlin.math.PI
 
 class Editor(val solver: Solver) {
 
@@ -25,7 +26,6 @@ class Editor(val solver: Solver) {
 
     val calculationsState = mutableStateOf(listOf(currentCalculation))
     val notificationsState = mutableStateOf(NotificationsLine())
-//    val shiftState = mutableStateOf(false)
 
     fun onKeyClicked(keyCode: Int) {
         notificationsState.value = notificationsState.value.copy(error = "")
@@ -88,7 +88,7 @@ class Editor(val solver: Solver) {
         3 -> ADD
         5 -> "1"
         6 -> "2"
-        7 -> "3"
+        7 -> if (shifted) PI.toString() else "3"
         8 -> SUB
         10 -> "4"
         11 -> "5"
