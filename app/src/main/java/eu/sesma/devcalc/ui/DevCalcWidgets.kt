@@ -36,6 +36,7 @@ import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.DIV
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.PLM
+import eu.sesma.devcalc.editor.Constants.SHIFT
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.editor.NotificationsLine
 import eu.sesma.devcalc.ui.theme.*
@@ -131,7 +132,7 @@ fun KeyPanel(
             Key(keyCode = 21, onClick = onClick, text = "Del")
             Key(keyCode = 22, onClick = onClick, text = "<-", secondaryText = "|<-")
             Key(keyCode = 23, onClick = onClick, text = "->", secondaryText = "->|")
-            Key(keyCode = 24, onClick = onClick, text = "Shift", shift = true)
+            Key(keyCode = 24, onClick = onClick, text = SHIFT, shift = true)
         }
         Row(
             modifier = Modifier.width(width),
@@ -317,7 +318,7 @@ fun Indicators(
         )
         Text(
             modifier = Modifier.padding(bottom = 1.dp),
-            text = if (notifications.shifted) "Shift" else "",
+            text = if (notifications.shifted) SHIFT else "",
             color = Color.Blue,
             style = MaterialTheme.typography.caption,
             fontWeight = FontWeight.Medium,
