@@ -29,6 +29,27 @@ class Solver {
         return Success(result = calculation.operands[0])
     }
 
+    fun fixSyntax(operationText: String): String{
+        var tmpOperation = fixDecimalZeroes(operationText)
+        tmpOperation = fixBrackets(tmpOperation)
+        return fixMissingProducts(tmpOperation)
+    }
+
+    @VisibleForTesting
+    internal  fun fixDecimalZeroes(operationText: String): String {
+        return operationText
+    }
+
+    @VisibleForTesting
+    internal  fun fixBrackets(operationText: String): String {
+        return operationText
+    }
+
+    @VisibleForTesting
+    internal  fun fixMissingProducts(operationText: String): String {
+        return operationText
+    }
+
     @VisibleForTesting
     internal fun getOperands(operationText: String): List<Double?> {
         val operandStrings = operationText.split(ADD, SUB, MUL, DIV)

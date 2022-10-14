@@ -150,9 +150,10 @@ class Editor(val solver: Solver) {
     }
 
     private fun executeActionEnter() {
-        val noCursorOperation = currentCalculation.operation.replaceFirst(CURSOR, "")
+        var noCursorOperation = currentCalculation.operation.replaceFirst(CURSOR, "")
         if (noCursorOperation.isEmpty()) return
 
+        noCursorOperation = solver.fixSyntax(noCursorOperation)
         when (val calculationResult = solver.solve(noCursorOperation)) {
             is Success -> onSuccessResult(noCursorOperation, calculationResult.result.toString())
             is SyntaxError -> onSyntaxErrorResult(calculationResult.cursorPosition)

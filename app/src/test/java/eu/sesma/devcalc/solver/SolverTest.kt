@@ -77,4 +77,64 @@ class SolverTest {
 
         assertEquals(expectedResult, (result as CalculationResult.SyntaxError).cursorPosition)
     }
+
+    @Test
+    fun `fix non existing integer zeroes`() {
+        val operationText = ".2+3×4.÷6.4−2×.3+9."
+        val expectedResult = "0.2+3×4÷6.4−2×0.3+9"
+
+        val result = solver.fixDecimalZeroes(operationText)
+
+        assertEquals(expectedResult, result)
+    }
+
+    @Test
+    fun `fix unmatched brackets`() {
+        val operationText = "2-(3+5"
+        val expectedResult = "2-(3+5)"
+
+        val result = solver.fixDecimalZeroes(operationText)
+
+        assertEquals(expectedResult, result)
+    }
+
+    @Test
+    fun `fix unmatched brackets 2`() {
+        val operationText = "(2-(3+5÷6"
+        val expectedResult = "(2-(3+5)÷6)"
+
+        val result = solver.fixDecimalZeroes(operationText)
+
+        assertEquals(expectedResult, result)
+    }
+
+    @Test
+    fun `fix unmatched brackets 3`() {
+        val operationText = "2-(3+5)÷6)"
+        val expectedResult = "2-(3+5)÷6"
+
+        val result = solver.fixDecimalZeroes(operationText)
+
+        assertEquals(expectedResult, result)
+    }
+
+    @Test
+    fun `fix unmatched brackets 4`() {
+        val operationText = ")2-)3+(5÷6)"
+        val expectedResult = "2-3+(5÷6)"
+
+        val result = solver.fixDecimalZeroes(operationText)
+
+        assertEquals(expectedResult, result)
+    }
+
+    @Test
+    fun `fix missing products`() {
+        val operationText = "2(3-1)3+3(5÷6)4"
+        val expectedResult = "2×(3-1)×3+3×(5÷6)×4"
+
+        val result = solver.fixMissingProducts(operationText)
+
+        assertEquals(expectedResult, result)
+    }
 }
