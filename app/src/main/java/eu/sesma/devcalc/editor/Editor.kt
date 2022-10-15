@@ -4,8 +4,10 @@ import androidx.compose.runtime.mutableStateOf
 import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.CURSOR
 import eu.sesma.devcalc.editor.Constants.DIV
+import eu.sesma.devcalc.editor.Constants.LBRKT
 import eu.sesma.devcalc.editor.Constants.MINUS
 import eu.sesma.devcalc.editor.Constants.MUL
+import eu.sesma.devcalc.editor.Constants.RBRKT
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.editor.Constants.SYNTAX_ERROR
 import eu.sesma.devcalc.editor.Editor.Actions.*
@@ -17,7 +19,7 @@ import kotlin.math.PI
 class Editor(val solver: Solver) {
 
     enum class Actions {
-        ANSWER, ENTER, ESC, CLEAR, DELETE, BACK, START, FORTH, END, NEGATE
+        ANSWER, ENTER, ESC, CLEAR, DELETE, BACK, START, FORTH, END, NEGATE, BRACKETS
     }
 
     private var currentCalculation = CalculationLine()
@@ -42,19 +44,7 @@ class Editor(val solver: Solver) {
         notificationsState.value = notificationsState.value.copy(shifted = false)
 
         if (keyValue != null) processKeyValue(keyValue)
-
-        if (keyAction != null) when (keyAction) {
-            ESC -> executeActionEsc()
-            CLEAR -> executeActionClear()
-            DELETE -> executeActionDelete()
-            ENTER -> executeActionEnter()
-            ANSWER -> executeActionAnswer()
-            BACK -> executeActionBack()
-            START -> executeActionBack(start = true)
-            FORTH -> executeActionForth()
-            END -> executeActionForth(end = true)
-            NEGATE -> executeActionNegate()
-        }
+        if (keyAction != null) processKeyAction(keyAction)
 
         updateScreen()
     }
@@ -107,6 +97,7 @@ class Editor(val solver: Solver) {
         2 -> ANSWER
         4 -> ENTER
         8 -> if (shifted) NEGATE else null
+        19 -> BRACKETS
         20 -> if (shifted) CLEAR else ESC
         21 -> DELETE
         22 -> if (shifted) START else BACK
@@ -115,13 +106,24 @@ class Editor(val solver: Solver) {
     }
 
     private fun processKeyValue(keyValue: String) {
-        currentCalculation = currentCalculation.copy(
-            operation = currentCalculation.operation.replaceFirst(
-                CURSOR,
-                "$keyValue${CURSOR}"
-            )
-        )
+        addAtCursorPosition("$keyValue$CURSOR")
         cursorPosition++
+    }
+
+    private fun processKeyAction(keyAction: Actions) {
+        when (keyAction) {
+            ESC -> executeActionEsc()
+            CLEAR -> executeActionClear()
+            DELETE -> executeActionDelete()
+            ENTER -> executeActionEnter()
+            ANSWER -> executeActionAnswer()
+            BACK -> executeActionBack()
+            START -> executeActionBack(start = true)
+            FORTH -> executeActionForth()
+            END -> executeActionForth(end = true)
+            NEGATE -> executeActionNegate()
+            BRACKETS -> executeAddBrackets()
+        }
     }
 
     private fun executeActionEsc() {
@@ -179,12 +181,7 @@ class Editor(val solver: Solver) {
     private fun executeActionAnswer() {
         if (calculations.isEmpty()) return
         val value = calculations[0].result
-        currentCalculation = currentCalculation.copy(
-            operation = currentCalculation.operation.replaceFirst(
-                CURSOR,
-                "$value${CURSOR}"
-            )
-        )
+        addAtCursorPosition("$value$CURSOR")
         cursorPosition += value.length
     }
 
@@ -218,6 +215,11 @@ class Editor(val solver: Solver) {
         updateScreen()
     }
 
+    private fun executeAddBrackets() {
+        addAtCursorPosition("$LBRKT$CURSOR$RBRKT")
+        cursorPosition++
+    }
+
     private fun updateScreen() {
         calculationsState.value = listOf(currentCalculation) + calculations
     }
@@ -232,6 +234,7 @@ class Editor(val solver: Solver) {
     }
 
     private fun addCursor() {
+        addAtCursorPosition("")
         val noCursorOperation = currentCalculation.operation.replaceFirst(CURSOR, "")
         currentCalculation = currentCalculation.copy(
             operation = noCursorOperation.substring(0, cursorPosition) +
@@ -252,13 +255,14 @@ class Editor(val solver: Solver) {
         val value =
             if (fieldIndex == 0) calculations[stackIndex].operation else calculations[stackIndex].result
         calculations[stackIndex] = calculations[stackIndex].copy(fieldSelected = -1)
-        currentCalculation = currentCalculation.copy(
-            operation = currentCalculation.operation.replaceFirst(
-                CURSOR,
-                "$value${CURSOR}"
-            )
-        )
+        addAtCursorPosition("$value$CURSOR")
         fieldSelected = null
         cursorPosition += value.length
+    }
+
+    private fun addAtCursorPosition(expression: String) {
+        currentCalculation = currentCalculation.copy(
+            operation = currentCalculation.operation.replaceFirst(CURSOR, expression)
+        )
     }
 }

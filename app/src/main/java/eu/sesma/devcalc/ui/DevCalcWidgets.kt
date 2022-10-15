@@ -34,8 +34,10 @@ import androidx.compose.ui.unit.dp
 import eu.sesma.devcalc.editor.CalculationLine
 import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.DIV
+import eu.sesma.devcalc.editor.Constants.LBRKT
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.PLM
+import eu.sesma.devcalc.editor.Constants.RBRKT
 import eu.sesma.devcalc.editor.Constants.SHIFT
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.editor.NotificationsLine
@@ -142,7 +144,7 @@ fun KeyPanel(
             Key(keyCode = 16, onClick = onClick, text = "8")
             Key(keyCode = 17, onClick = onClick, text = "9")
             Key(keyCode = 18, onClick = onClick, text = DIV)
-            Key(keyCode = 19, onClick = onClick)
+            Key(keyCode = 19, onClick = onClick, text = "$LBRKT $RBRKT")
         }
         Row(
             modifier = Modifier.width(width),
