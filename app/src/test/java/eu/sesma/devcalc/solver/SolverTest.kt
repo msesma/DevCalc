@@ -93,7 +93,7 @@ class SolverTest {
         val operationText = "2−(3+5"
         val expectedResult = "2−(3+5)"
 
-        val result = solver.fixDecimals(operationText)
+        val result = solver.fixBrackets(operationText)
 
         assertEquals(expectedResult, result)
     }
@@ -103,17 +103,17 @@ class SolverTest {
         val operationText = "(2−(3+5÷6"
         val expectedResult = "(2−(3+5÷6))"
 
-        val result = solver.fixDecimals(operationText)
+        val result = solver.fixBrackets(operationText)
 
         assertEquals(expectedResult, result)
     }
 
     @Test
     fun `fix unmatched brackets 3`() {
-        val operationText = "2−(3+5)-6)"
+        val operationText = "2−(3+5)−6)"
         val expectedResult = "(2−(3+5)−6)"
 
-        val result = solver.fixDecimals(operationText)
+        val result = solver.fixBrackets(operationText)
 
         assertEquals(expectedResult, result)
     }
@@ -121,9 +121,9 @@ class SolverTest {
     @Test
     fun `fix unmatched brackets 4`() {
         val operationText = ")2−)3+(5÷6)"
-        val expectedResult = "2−3+(5÷6)"// SYNTAX ERROR OR REMOVE UNMATCHED BRACKETS
+        val expectedResult = "(()2−)3+(5÷6)"
 
-        val result = solver.fixDecimals(operationText)
+        val result = solver.fixBrackets(operationText)
 
         assertEquals(expectedResult, result)
     }

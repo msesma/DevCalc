@@ -38,11 +38,6 @@ class Solver {
     }
 
     @VisibleForTesting
-    internal fun fixBrackets(operationText: String): String {
-        return operationText
-    }
-
-    @VisibleForTesting
     internal fun getOperands(operationText: String): List<Double?> {
         val operandStrings = operationText.split(ADD, SUB, MUL, DIV)
         return operandStrings.map {
@@ -109,6 +104,16 @@ class Solver {
         return fixedOperandStrings
             .zip(operators, transform = { a, b -> a + b })
             .joinToString(separator = "") + fixedOperandStrings.last()
+    }
+
+    @VisibleForTesting
+    internal fun fixBrackets(operationText: String): String {
+        val diff = operationText.count { it.toString() == LBRKT } - operationText.count { it.toString() == RBRKT }
+        return when {
+            diff == 0 -> operationText
+            diff < 0 -> operationText.padStart(operationText.length - diff, LBRKT[0])
+            else -> operationText.padEnd(operationText.length + diff, RBRKT[0])
+        }
     }
 
     @VisibleForTesting
