@@ -86,7 +86,7 @@ class Solver {
 
     @VisibleForTesting
     internal fun fixDecimals(operationText: String): String {
-        val operandStrings = operationText.split(ADD, SUB, MUL, DIV, LBRKT)
+        val operandStrings = operationText.split(ADD, SUB, MUL, DIV, LBRKT, RBRKT)
         val fixedOperandStrings = operandStrings.map { operand ->
             if (operand.isNotEmpty() && operand[0] == '.') "0$operand" else operand
         }.map { operand ->
@@ -98,7 +98,7 @@ class Solver {
         val operators = extractOperatorList(
             operandStrings = operandStrings,
             operationText = operationText,
-            operands = (ADD + SUB + MUL + DIV + LBRKT).toCharArray()
+            operands = (ADD + SUB + MUL + DIV + LBRKT + RBRKT).toCharArray()
         )
 
         return fixedOperandStrings

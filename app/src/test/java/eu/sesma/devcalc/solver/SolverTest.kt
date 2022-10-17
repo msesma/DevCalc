@@ -80,8 +80,8 @@ class SolverTest {
 
     @Test
     fun `fix non existing integer zeroes and ending decimal zeroes or dot`() {
-        val operationText = ".2+3×4.÷6.400−2×.3−(.5+1)+9."
-        val expectedResult = "0.2+3×4÷6.4−2×0.3−(0.5+1)+9"
+        val operationText = ".2+3×4.÷6.400−2×.3−(.5+1).3+9."
+        val expectedResult = "0.2+3×4÷6.4−2×0.3−(0.5+1)0.3+9"
 
         val result = solver.fixDecimals(operationText)
 
