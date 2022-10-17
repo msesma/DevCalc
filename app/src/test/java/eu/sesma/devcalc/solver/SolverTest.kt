@@ -59,6 +59,26 @@ class SolverTest {
     }
 
     @Test
+    fun `solve operation with simple brackets`() {
+        val operationText = "2+3×(4÷6)−2×(3+9)"
+        val expectedResult = -20.0
+
+        val result = solver.solve(operationText)
+
+        assertEquals(expectedResult, (result as CalculationResult.Success).result, 0.0)
+    }
+
+    @Test
+    fun `solve operation with nested brackets`() {
+        val operationText = "2+3×((4÷6)−2×(3+9))"
+        val expectedResult = -68.0
+
+        val result = solver.solve(operationText)
+
+        assertEquals(expectedResult, (result as CalculationResult.Success).result, 0.1)
+    }
+
+    @Test
     fun `solve operation with no operand syntax error`() {
         val operationText = "2+3×4÷−2×3+9"
         val expectedResult = 6
@@ -79,6 +99,16 @@ class SolverTest {
     }
 
     @Test
+    fun `solve malformed brackets syntax error`() {
+        val operationText = "2+)6(-5"
+        val expectedResult = 2
+
+        val result = solver.solve(operationText)
+
+        assertEquals(expectedResult, (result as CalculationResult.SyntaxError).cursorPosition)
+    }
+
+        @Test
     fun `fix non existing integer zeroes and ending decimal zeroes or dot`() {
         val operationText = ".2+3×4.÷6.400−2×.3−(.5+1).3+9."
         val expectedResult = "0.2+3×4÷6.4−2×0.3−(0.5+1)0.3+9"
