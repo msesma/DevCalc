@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -34,11 +35,13 @@ import androidx.compose.ui.unit.dp
 import eu.sesma.devcalc.editor.CalculationLine
 import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.DIV
+import eu.sesma.devcalc.editor.Constants.INV
 import eu.sesma.devcalc.editor.Constants.LBRKT
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.PLM
 import eu.sesma.devcalc.editor.Constants.RBRKT
 import eu.sesma.devcalc.editor.Constants.SHIFT
+import eu.sesma.devcalc.editor.Constants.SQR
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.editor.NotificationsLine
 import eu.sesma.devcalc.ui.theme.*
@@ -50,6 +53,7 @@ fun Key(
     keyCode: Int,
     shift: Boolean = false,
     text: String = "",
+    annotatedText: AnnotatedString = AnnotatedString(""),
     secondaryText: String = "",
     onClick: (Int) -> Unit,
 ) {
@@ -77,7 +81,7 @@ fun Key(
                     .fillMaxWidth()
                     .height(44.dp)
                     .background(color = if (shift) Color.Blue else KeyGrey),
-                text = text,
+                text = if (annotatedText.text.isNotEmpty()) annotatedText else AnnotatedString(text = text),
                 textAlign = TextAlign.Center,
                 style = if (shift) MaterialTheme.typography.h6 else MaterialTheme.typography.h5,
                 fontWeight = if (shift) FontWeight.Normal else FontWeight.Bold,
@@ -154,7 +158,7 @@ fun KeyPanel(
             Key(keyCode = 11, onClick = onClick, text = "5")
             Key(keyCode = 12, onClick = onClick, text = "6")
             Key(keyCode = 13, onClick = onClick, text = MUL)
-            Key(keyCode = 14, onClick = onClick)
+            Key(keyCode = 14, onClick = onClick, annotatedText = INV)
         }
         Row(
             modifier = Modifier.width(width),
@@ -164,7 +168,7 @@ fun KeyPanel(
             Key(keyCode = 6, onClick = onClick, text = "2")
             Key(keyCode = 7, onClick = onClick, text = "3", secondaryText = "π")
             Key(keyCode = 8, onClick = onClick, text = SUB, secondaryText = PLM)
-            Key(keyCode = 9, onClick = onClick)
+            Key(keyCode = 9, onClick = onClick, annotatedText = SQR)
         }
         Row(
             modifier = Modifier.width(width),

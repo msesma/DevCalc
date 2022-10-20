@@ -2,7 +2,6 @@ package eu.sesma.devcalc.solver
 
 import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
 class SolverTest {
@@ -175,6 +174,36 @@ class SolverTest {
         val expectedResult = "2×(3−1)×3+3×(5÷6)×4)"
 
         val result = solver.fixMissingProducts(operationText)
+
+        assertEquals(expectedResult, result)
+    }
+
+    @Test
+    fun `resolve square`() {
+        val operandText = "2^2"
+        val expectedResult = 4.0
+
+        val result = solver.resolvePowers(operandText)
+
+        assertEquals(expectedResult, result)
+    }
+
+    @Test
+    fun `resolve inverse`() {
+        val operandText = "2^-1"
+        val expectedResult = 0.5
+
+        val result = solver.resolvePowers(operandText)
+
+        assertEquals(expectedResult, result)
+    }
+
+    @Test
+    fun `resolve multi pow`() {
+        val operandText = "2^2^3"
+        val expectedResult = 64.0
+
+        val result = solver.resolvePowers(operandText)
 
         assertEquals(expectedResult, result)
     }

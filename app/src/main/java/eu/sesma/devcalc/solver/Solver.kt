@@ -4,12 +4,15 @@ import androidx.annotation.VisibleForTesting
 import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.DIV
 import eu.sesma.devcalc.editor.Constants.LBRKT
+import eu.sesma.devcalc.editor.Constants.MINUS
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.OPERANDS
+import eu.sesma.devcalc.editor.Constants.POW
 import eu.sesma.devcalc.editor.Constants.RBRKT
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.solver.CalculationResult.Success
 import eu.sesma.devcalc.solver.CalculationResult.SyntaxError
+import kotlin.math.pow
 
 class Solver {
 
@@ -31,7 +34,7 @@ class Solver {
 
             tempOperationText = when (rightString[nextBracket]) {
                 // RBRKT: Expression between brackets
-                RBRKT[0] -> when (val result =solveExpression(rightString.substring(0, nextBracket), errorPosition)) {
+                RBRKT[0] -> when (val result = solveExpression(rightString.substring(0, nextBracket), errorPosition)) {
                     is Success -> tempOperationText.substring(0, firstLBracket) +
                             result.result + tempOperationText.substring(firstLBracket + nextBracket + 2)
                     is SyntaxError -> return SyntaxError(cursorPosition = result.cursorPosition + firstLBracket + 1)
@@ -78,13 +81,24 @@ class Solver {
     @VisibleForTesting
     internal fun getOperands(operationText: String): List<Double?> {
         val operandStrings = operationText.split(ADD, SUB, MUL, DIV)
-        return operandStrings.map {
-            try {
-                it.toDouble()
-            } catch (nfe: java.lang.NumberFormatException) {
-                null
-            }
+        return operandStrings.map { operandString ->
+            if (operandString.contains(POW)) resolvePowers(operandString)
+            else operandString.toDoubleOrNull()
         }
+    }
+
+    @VisibleForTesting
+    internal fun resolvePowers(operandString: String): Double? {
+        val a = "${MINUS}1".toDoubleOrNull()
+        val b = operandString.split(POW)
+
+        val operands = operandString.split(POW).map { it.toDoubleOrNull() }
+        val errorIndex = operands.indexOf(null)
+        if (errorIndex != -1) return null
+
+        @Suppress("UNCHECKED_CAST")
+        val pow = (operands as List<Double>).drop(1).fold(initial = 1.0, operation = { acc, i -> acc * i })
+        return operands[0].pow(pow)
     }
 
     @VisibleForTesting

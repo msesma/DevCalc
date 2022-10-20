@@ -7,6 +7,7 @@ import eu.sesma.devcalc.editor.Constants.DIV
 import eu.sesma.devcalc.editor.Constants.LBRKT
 import eu.sesma.devcalc.editor.Constants.MINUS
 import eu.sesma.devcalc.editor.Constants.MUL
+import eu.sesma.devcalc.editor.Constants.POW
 import eu.sesma.devcalc.editor.Constants.RBRKT
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.editor.Constants.SYNTAX_ERROR
@@ -19,7 +20,7 @@ import kotlin.math.PI
 class Editor(val solver: Solver) {
 
     enum class Actions {
-        ANSWER, ENTER, ESC, CLEAR, DELETE, BACK, START, FORTH, END, NEGATE, BRACKETS
+        ANSWER, ENTER, ESC, CLEAR, DELETE, BACK, START, FORTH, END, NEGATE, SQUARE, INVERSE, BRACKETS
     }
 
     private var currentCalculation = CalculationLine()
@@ -97,6 +98,8 @@ class Editor(val solver: Solver) {
         2 -> ANSWER
         4 -> ENTER
         8 -> if (shifted) NEGATE else null
+        9 -> SQUARE
+        14 -> INVERSE
         19 -> BRACKETS
         20 -> if (shifted) CLEAR else ESC
         21 -> DELETE
@@ -122,7 +125,9 @@ class Editor(val solver: Solver) {
             FORTH -> executeActionForth()
             END -> executeActionForth(end = true)
             NEGATE -> executeActionNegate()
-            BRACKETS -> executeAddBrackets()
+            SQUARE -> executeActionConcatToOperand("${POW}2")
+            INVERSE -> executeActionConcatToOperand("$POW${MINUS}1")
+            BRACKETS -> executeActionAddBrackets()
         }
     }
 
@@ -201,7 +206,7 @@ class Editor(val solver: Solver) {
 
     private fun executeActionNegate() {
         val currentOperand = currentCalculation.operation.split(ADD, SUB, MUL, DIV).first { it.contains(CURSOR) }
-        val currentOperandNoCursor = if (currentOperand[0].toString() == MINUS) {
+        val negatedOperand = if (currentOperand[0].toString() == MINUS) {
             cursorPosition--
             currentOperand.removePrefix(MINUS)
         } else {
@@ -209,13 +214,24 @@ class Editor(val solver: Solver) {
             MINUS + currentOperand
         }
         currentCalculation = CalculationLine(
-            operation = currentCalculation.operation.replaceFirst(currentOperand, currentOperandNoCursor)
+            operation = currentCalculation.operation.replaceFirst(currentOperand, negatedOperand)
         )
         addCursor()
         updateScreen()
     }
 
-    private fun executeAddBrackets() {
+    private fun executeActionConcatToOperand(addon: String) {
+        val currentOperand = currentCalculation.operation.split(ADD, SUB, MUL, DIV).first { it.contains(CURSOR) }
+        if (currentOperand.last() == CURSOR[0]) cursorPosition += addon.length
+        val newOperand = currentOperand + addon
+        currentCalculation = CalculationLine(
+            operation = currentCalculation.operation.replaceFirst(currentOperand, newOperand)
+        )
+        addCursor()
+        updateScreen()
+    }
+
+    private fun executeActionAddBrackets() {
         addAtCursorPosition("$LBRKT$CURSOR$RBRKT")
         cursorPosition++
     }
