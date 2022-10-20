@@ -14,9 +14,47 @@ import eu.sesma.devcalc.solver.CalculationResult.SyntaxError
 class Solver {
 
     fun solve(operationText: String): CalculationResult {
+        val firstBracket = operationText.indexOfAny((LBRKT + RBRKT).toCharArray())
+
+        return if (firstBracket != -1 && operationText[firstBracket] == RBRKT[0])
+            SyntaxError(cursorPosition = firstBracket)
+        else solveBracketsLevel(operationText)
+    }
+
+    private fun solveBracketsLevel(operationText: String, errorPosition: Int = 0): CalculationResult {
+        var tempOperationText = operationText
+        var firstLBracket = operationText.indexOfFirst { it == LBRKT[0] }
+
+        while (firstLBracket != -1) {
+            val rightString = tempOperationText.substring(firstLBracket + 1)
+            val nextBracket = rightString.indexOfAny((LBRKT + RBRKT).toCharArray())
+
+            tempOperationText = when (rightString[nextBracket]) {
+                // RBRKT: Expression between brackets
+                RBRKT[0] -> when (val result =solveExpression(rightString.substring(0, nextBracket), errorPosition)) {
+                    is Success -> tempOperationText.substring(0, firstLBracket) +
+                            result.result + tempOperationText.substring(firstLBracket + nextBracket + 2)
+                    is SyntaxError -> return SyntaxError(cursorPosition = result.cursorPosition + firstLBracket + 1)
+                }
+                // LBRKT: Next bracket level
+                else -> when (val result = solveBracketsLevel(rightString, errorPosition)) {
+                    is Success -> tempOperationText.substring(0, firstLBracket) + result.result
+                    is SyntaxError -> return SyntaxError(cursorPosition = result.cursorPosition + firstLBracket + 1)
+                }
+            }
+
+            firstLBracket = tempOperationText.indexOfFirst { it.toString() == LBRKT }
+        }
+
+        return solveExpression(tempOperationText.replace(RBRKT, ""), errorPosition)
+    }
+
+    private fun solveExpression(operationText: String, baseErrorPosition: Int): CalculationResult {
         val operands = getOperands(operationText)
         val errorIndex = operands.indexOf(null)
-        if (errorIndex != -1) return SyntaxError(cursorPosition = getSyntaxErrorPosition(operationText, errorIndex))
+        if (errorIndex != -1) return SyntaxError(
+            cursorPosition = getSyntaxErrorPosition(operationText, errorIndex) + baseErrorPosition
+        )
 
         @Suppress("UNCHECKED_CAST")
         var calculation = Calculation(

@@ -2,6 +2,7 @@ package eu.sesma.devcalc.solver
 
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 
 class SolverTest {
@@ -102,6 +103,16 @@ class SolverTest {
     fun `solve malformed brackets syntax error`() {
         val operationText = "2+)6(-5"
         val expectedResult = 2
+
+        val result = solver.solve(operationText)
+
+        assertEquals(expectedResult, (result as CalculationResult.SyntaxError).cursorPosition)
+    }
+
+    @Test
+    fun `solve malformed brackets syntax error 2`() {
+        val operationText = "5-(2+)6(-5"
+        val expectedResult = 5
 
         val result = solver.solve(operationText)
 
