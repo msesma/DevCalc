@@ -22,6 +22,7 @@ object Constants {
     const val LBRKT = "("
     const val RBRKT = ")"
     const val POW = "^"
+    const val ROOT ="√"
     val INV = buildAnnotatedString {
         append("x")
         withStyle( superscript) { append("-1") }

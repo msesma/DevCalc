@@ -34,7 +34,7 @@ class Editor(val solver: Solver) {
     fun onKeyClicked(keyCode: Int) {
         notificationsState.value = notificationsState.value.copy(error = "")
 
-        if (keyCode == 24) {
+        if (keyCode == 34) {
             notificationsState.value = notificationsState.value.copy(shifted = !notificationsState.value.shifted)
             return
         }
@@ -98,13 +98,13 @@ class Editor(val solver: Solver) {
         2 -> ANSWER
         4 -> ENTER
         8 -> if (shifted) NEGATE else null
-        9 -> SQUARE
         14 -> INVERSE
         19 -> BRACKETS
-        20 -> if (shifted) CLEAR else ESC
-        21 -> DELETE
-        22 -> if (shifted) START else BACK
-        23 -> if (shifted) END else FORTH
+        24 -> SQUARE
+        30 -> if (shifted) CLEAR else ESC
+        31 -> DELETE
+        32 -> if (shifted) START else BACK
+        33 -> if (shifted) END else FORTH
         else -> null
     }
 

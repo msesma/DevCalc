@@ -40,6 +40,7 @@ import eu.sesma.devcalc.editor.Constants.LBRKT
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.PLM
 import eu.sesma.devcalc.editor.Constants.RBRKT
+import eu.sesma.devcalc.editor.Constants.ROOT
 import eu.sesma.devcalc.editor.Constants.SHIFT
 import eu.sesma.devcalc.editor.Constants.SQR
 import eu.sesma.devcalc.editor.Constants.SUB
@@ -126,7 +127,7 @@ fun KeyPanel(
     onClick: (Int) -> Unit = {},
 ) {
     Column(
-        modifier = modifier.height(320.dp),
+        modifier = modifier.wrapContentHeight(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         val width = 320.dp
@@ -134,11 +135,31 @@ fun KeyPanel(
             modifier = Modifier.width(width),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Key(keyCode = 20, onClick = onClick, text = "Esc", secondaryText = "Clear")
-            Key(keyCode = 21, onClick = onClick, text = "Del")
-            Key(keyCode = 22, onClick = onClick, text = "<-", secondaryText = "|<-")
-            Key(keyCode = 23, onClick = onClick, text = "->", secondaryText = "->|")
-            Key(keyCode = 24, onClick = onClick, text = SHIFT, shift = true)
+            Key(keyCode = 30, onClick = onClick, text = "Esc", secondaryText = "Clear")
+            Key(keyCode = 31, onClick = onClick, text = "Del")
+            Key(keyCode = 32, onClick = onClick, text = "<-", secondaryText = "|<-")
+            Key(keyCode = 33, onClick = onClick, text = "->", secondaryText = "->|")
+            Key(keyCode = 34, onClick = onClick, text = SHIFT, shift = true)
+        }
+        Row(
+            modifier = Modifier.width(width),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Key(keyCode = 25, onClick = onClick)
+            Key(keyCode = 26, onClick = onClick)
+            Key(keyCode = 27, onClick = onClick)
+            Key(keyCode = 28, onClick = onClick)
+            Key(keyCode = 29, onClick = onClick)
+        }
+        Row(
+            modifier = Modifier.width(width),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Key(keyCode = 20, onClick = onClick)
+            Key(keyCode = 21, onClick = onClick)
+            Key(keyCode = 22, onClick = onClick)
+            Key(keyCode = 23, onClick = onClick)
+            Key(keyCode = 24, onClick = onClick, annotatedText = SQR, secondaryText = ROOT)
         }
         Row(
             modifier = Modifier.width(width),
@@ -168,7 +189,7 @@ fun KeyPanel(
             Key(keyCode = 6, onClick = onClick, text = "2")
             Key(keyCode = 7, onClick = onClick, text = "3", secondaryText = "π")
             Key(keyCode = 8, onClick = onClick, text = SUB, secondaryText = PLM)
-            Key(keyCode = 9, onClick = onClick, annotatedText = SQR)
+            Key(keyCode = 9, onClick = onClick)
         }
         Row(
             modifier = Modifier.width(width),
@@ -350,7 +371,7 @@ fun Screen(
 ) {
     Column(
         modifier = modifier
-            .padding(top = 32.dp, start = 32.dp, end = 32.dp)
+            .padding(top = 16.dp, start = 32.dp, end = 32.dp)
             .fillMaxWidth()
             .height(240.dp)
             .border(width = 1.dp, color = MaterialTheme.colors.onBackground)
@@ -413,7 +434,7 @@ fun CalcComposeView(
             )
             Surface(modifier = Modifier.weight(1f)) {}
             KeyPanel(
-                modifier = Modifier.padding(bottom = 32.dp),
+                modifier = Modifier.padding(bottom = 8.dp),
                 onClick = { keyCode ->
                     coroutineScope.launch { scrollState.animateScrollToItem(0, 0) }
                     onKeyClick(keyCode)
