@@ -22,17 +22,26 @@ object Constants {
     const val LBRKT = "("
     const val RBRKT = ")"
     const val POW = "^"
-    const val ROOT ="√"
+    const val ROOT = "√"
     val INV = buildAnnotatedString {
         append("x")
-        withStyle( superscript) { append("-1") }
+        withStyle(superscript) { append("-1") }
     }
     val SQR = buildAnnotatedString {
         append("x")
-        withStyle( superscript) { append("2") }
+        withStyle(superscript) { append("2") }
     }
+    const val LN = "LN"
+    const val LOG = "LOG"
+    const val SIN = "SIN"
+    const val ASIN = "ASIN"
+    const val COS = "COS"
+    const val ACOS = "ACOS"
+    const val TAN = "TAN"
+    const val ATAN = "ATAN"
 
     const val OPERANDS = ADD + SUB + MUL + DIV
+    const val FUNCTIONS = LN + LOG + SIN + ASIN + COS + ACOS + TAN + ATAN
 
     const val SYNTAX_ERROR = "Syntax error"
     const val SHIFT = "Shift"

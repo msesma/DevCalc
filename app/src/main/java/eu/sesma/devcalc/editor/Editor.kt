@@ -15,12 +15,14 @@ import eu.sesma.devcalc.editor.Editor.Actions.*
 import eu.sesma.devcalc.solver.CalculationResult.Success
 import eu.sesma.devcalc.solver.CalculationResult.SyntaxError
 import eu.sesma.devcalc.solver.Solver
+import kotlin.math.E
 import kotlin.math.PI
 
 class Editor(val solver: Solver) {
 
     enum class Actions {
-        ANSWER, ENTER, ESC, CLEAR, DELETE, BACK, START, FORTH, END, NEGATE, SQUARE, INVERSE, BRACKETS
+        ANSWER, ENTER, ESC, CLEAR, DELETE, BACK, START, FORTH, END, NEGATE, SQUARE, INVERSE, BRACKETS,
+        LN, LOG, SIN, ASIN, COS, ACOS, TAN, ATAN, MODE
     }
 
     private var currentCalculation = CalculationLine()
@@ -80,7 +82,7 @@ class Editor(val solver: Solver) {
         1 -> "."
         3 -> ADD
         5 -> "1"
-        6 -> "2"
+        6 -> if (shifted) E.toString() else "2"
         7 -> if (shifted) PI.toString() else "3"
         8 -> if (shifted) null else SUB
         10 -> "4"
@@ -99,7 +101,11 @@ class Editor(val solver: Solver) {
         4 -> ENTER
         8 -> if (shifted) NEGATE else null
         14 -> INVERSE
-        19 -> BRACKETS
+        19 -> if (shifted) MODE else BRACKETS
+        20 -> if (shifted) LOG else LN
+        21 -> if (shifted) ASIN else SIN
+        22 -> if (shifted) ACOS else COS
+        23 -> if (shifted) ATAN else TAN
         24 -> SQUARE
         30 -> if (shifted) CLEAR else ESC
         31 -> DELETE
@@ -128,7 +134,25 @@ class Editor(val solver: Solver) {
             SQUARE -> executeActionConcatToOperand("${POW}2")
             INVERSE -> executeActionConcatToOperand("$POW${MINUS}1")
             BRACKETS -> executeActionAddBrackets()
+            LN -> executeActionFunction(LN)
+            LOG -> executeActionFunction(LOG)
+            SIN -> executeActionFunction(SIN)
+            ASIN -> executeActionFunction(ASIN)
+            COS -> executeActionFunction(COS)
+            ACOS -> executeActionFunction(ACOS)
+            TAN -> executeActionFunction(TAN)
+            ATAN -> executeActionFunction(ATAN)
+            MODE -> executeActionMode()
         }
+    }
+
+    private fun executeActionMode() {
+
+    }
+
+    private fun executeActionFunction(function: Actions) {
+        addAtCursorPosition("$function$LBRKT$CURSOR$RBRKT")
+        cursorPosition += function.toString().length
     }
 
     private fun executeActionEsc() {

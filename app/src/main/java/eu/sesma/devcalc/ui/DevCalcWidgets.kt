@@ -155,10 +155,10 @@ fun KeyPanel(
             modifier = Modifier.width(width),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Key(keyCode = 20, onClick = onClick)
-            Key(keyCode = 21, onClick = onClick)
-            Key(keyCode = 22, onClick = onClick)
-            Key(keyCode = 23, onClick = onClick)
+            Key(keyCode = 20, onClick = onClick, text = "LN", secondaryText = "LOG")
+            Key(keyCode = 21, onClick = onClick, text = "SIN", secondaryText = "ASIN")
+            Key(keyCode = 22, onClick = onClick, text = "COS", secondaryText = "ACOS")
+            Key(keyCode = 23, onClick = onClick, text = "TAN", secondaryText = "ATAN")
             Key(keyCode = 24, onClick = onClick, annotatedText = SQR, secondaryText = ROOT)
         }
         Row(
@@ -169,7 +169,7 @@ fun KeyPanel(
             Key(keyCode = 16, onClick = onClick, text = "8")
             Key(keyCode = 17, onClick = onClick, text = "9")
             Key(keyCode = 18, onClick = onClick, text = DIV)
-            Key(keyCode = 19, onClick = onClick, text = "$LBRKT $RBRKT")
+            Key(keyCode = 19, onClick = onClick, text = "$LBRKT $RBRKT", secondaryText = "°/rad")
         }
         Row(
             modifier = Modifier.width(width),
@@ -186,7 +186,7 @@ fun KeyPanel(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Key(keyCode = 5, onClick = onClick, text = "1")
-            Key(keyCode = 6, onClick = onClick, text = "2")
+            Key(keyCode = 6, onClick = onClick, text = "2", secondaryText = "e")
             Key(keyCode = 7, onClick = onClick, text = "3", secondaryText = "π")
             Key(keyCode = 8, onClick = onClick, text = SUB, secondaryText = PLM)
             Key(keyCode = 9, onClick = onClick)
