@@ -3,11 +3,13 @@ package eu.sesma.devcalc.editor
 import androidx.compose.runtime.mutableStateOf
 import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.CURSOR
+import eu.sesma.devcalc.editor.Constants.DEG
 import eu.sesma.devcalc.editor.Constants.DIV
 import eu.sesma.devcalc.editor.Constants.LBRKT
 import eu.sesma.devcalc.editor.Constants.MINUS
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.POW
+import eu.sesma.devcalc.editor.Constants.RAD
 import eu.sesma.devcalc.editor.Constants.RBRKT
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.editor.Constants.SYNTAX_ERROR
@@ -147,7 +149,8 @@ class Editor(val solver: Solver) {
     }
 
     private fun executeActionMode() {
-
+        val currentMode = notificationsState.value.mode
+        notificationsState.value = notificationsState.value.copy(mode = if (currentMode == DEG) RAD else DEG)
     }
 
     private fun executeActionFunction(function: Actions) {
@@ -185,7 +188,7 @@ class Editor(val solver: Solver) {
         if (noCursorOperation.isEmpty()) return
 
         noCursorOperation = solver.fixSyntax(noCursorOperation)
-        when (val calculationResult = solver.solve(noCursorOperation)) {
+        when (val calculationResult = solver.solve(noCursorOperation, notificationsState.value.mode == RAD)) {
             is Success -> onSuccessResult(noCursorOperation, calculationResult.result.toString())
             is SyntaxError -> onSyntaxErrorResult(calculationResult.cursorPosition)
         }

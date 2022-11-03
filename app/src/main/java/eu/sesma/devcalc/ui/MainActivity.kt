@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch { saveCalculationState(editor.calculationsState.value) }
     }
 
-    private suspend fun saveCalculationState(calculationState: List<CalculationLine>) {
+    private suspend fun saveCalculationState(calculationState: List<CalculationLine>) { //TODO save trig mode
         this.calcStateDataStore.updateData { calcState ->
             val builder = calcState.toBuilder().clearCalcState()
             calculationState.forEach { calculationLine ->

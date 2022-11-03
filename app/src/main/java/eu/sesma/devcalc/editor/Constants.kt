@@ -39,9 +39,10 @@ object Constants {
     const val ACOS = "ACOS"
     const val TAN = "TAN"
     const val ATAN = "ATAN"
+    const val DEG = "°"
+    const val RAD = "π"
 
     const val OPERANDS = ADD + SUB + MUL + DIV
-    const val FUNCTIONS = LN + LOG + SIN + ASIN + COS + ACOS + TAN + ATAN
 
     const val SYNTAX_ERROR = "Syntax error"
     const val SHIFT = "Shift"

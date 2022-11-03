@@ -169,7 +169,7 @@ fun KeyPanel(
             Key(keyCode = 16, onClick = onClick, text = "8")
             Key(keyCode = 17, onClick = onClick, text = "9")
             Key(keyCode = 18, onClick = onClick, text = DIV)
-            Key(keyCode = 19, onClick = onClick, text = "$LBRKT $RBRKT", secondaryText = "°/rad")
+            Key(keyCode = 19, onClick = onClick, text = "$LBRKT $RBRKT", secondaryText = "°/π")
         }
         Row(
             modifier = Modifier.width(width),
@@ -347,6 +347,13 @@ fun Indicators(
             modifier = Modifier.padding(bottom = 1.dp),
             text = if (notifications.shifted) SHIFT else "",
             color = Color.Blue,
+            style = MaterialTheme.typography.caption,
+            fontWeight = FontWeight.Medium,
+        )
+        Text(
+            modifier = Modifier.padding(bottom = 1.dp),
+            text = notifications.mode,
+            color = Color.Black,
             style = MaterialTheme.typography.caption,
             fontWeight = FontWeight.Medium,
         )

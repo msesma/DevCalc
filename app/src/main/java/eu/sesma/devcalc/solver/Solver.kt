@@ -4,7 +4,8 @@ import androidx.annotation.VisibleForTesting
 import eu.sesma.devcalc.editor.Constants.ADD
 import eu.sesma.devcalc.editor.Constants.DIV
 import eu.sesma.devcalc.editor.Constants.LBRKT
-import eu.sesma.devcalc.editor.Constants.MINUS
+import eu.sesma.devcalc.editor.Constants.LN
+import eu.sesma.devcalc.editor.Constants.LOG
 import eu.sesma.devcalc.editor.Constants.MUL
 import eu.sesma.devcalc.editor.Constants.OPERANDS
 import eu.sesma.devcalc.editor.Constants.POW
@@ -12,19 +13,21 @@ import eu.sesma.devcalc.editor.Constants.RBRKT
 import eu.sesma.devcalc.editor.Constants.SUB
 import eu.sesma.devcalc.solver.CalculationResult.Success
 import eu.sesma.devcalc.solver.CalculationResult.SyntaxError
+import kotlin.math.ln
+import kotlin.math.log10
 import kotlin.math.pow
 
 class Solver {
 
-    fun solve(operationText: String): CalculationResult {
+    fun solve(operationText: String, radians: Boolean = true): CalculationResult {
         val firstBracket = operationText.indexOfAny((LBRKT + RBRKT).toCharArray())
 
         return if (firstBracket != -1 && operationText[firstBracket] == RBRKT[0])
             SyntaxError(cursorPosition = firstBracket)
-        else solveBracketsLevel(operationText)
+        else solveBracketsLevel(operationText, 0, radians)
     }
 
-    private fun solveBracketsLevel(operationText: String, errorPosition: Int = 0): CalculationResult {
+    private fun solveBracketsLevel(operationText: String, errorPosition: Int, radians: Boolean): CalculationResult {
         var tempOperationText = operationText
         var firstLBracket = operationText.indexOfFirst { it == LBRKT[0] }
 
@@ -34,13 +37,14 @@ class Solver {
 
             tempOperationText = when (rightString[nextBracket]) {
                 // RBRKT: Expression between brackets
-                RBRKT[0] -> when (val result = solveExpression(rightString.substring(0, nextBracket), errorPosition)) {
+                RBRKT[0] -> when (val result =
+                    solveExpression(rightString.substring(0, nextBracket), errorPosition, radians)) {
                     is Success -> tempOperationText.substring(0, firstLBracket) +
                             result.result + tempOperationText.substring(firstLBracket + nextBracket + 2)
                     is SyntaxError -> return SyntaxError(cursorPosition = result.cursorPosition + firstLBracket + 1)
                 }
                 // LBRKT: Next bracket level
-                else -> when (val result = solveBracketsLevel(rightString, errorPosition)) {
+                else -> when (val result = solveBracketsLevel(rightString, errorPosition, radians)) {
                     is Success -> tempOperationText.substring(0, firstLBracket) + result.result
                     is SyntaxError -> return SyntaxError(cursorPosition = result.cursorPosition + firstLBracket + 1)
                 }
@@ -49,11 +53,11 @@ class Solver {
             firstLBracket = tempOperationText.indexOfFirst { it.toString() == LBRKT }
         }
 
-        return solveExpression(tempOperationText.replace(RBRKT, ""), errorPosition)
+        return solveExpression(tempOperationText.replace(RBRKT, ""), errorPosition, radians)
     }
 
-    private fun solveExpression(operationText: String, baseErrorPosition: Int): CalculationResult {
-        val operands = getOperands(operationText)
+    private fun solveExpression(operationText: String, baseErrorPosition: Int, radians: Boolean): CalculationResult {
+        val operands = getOperands(operationText, radians)
         val errorIndex = operands.indexOf(null)
         if (errorIndex != -1) return SyntaxError(
             cursorPosition = getSyntaxErrorPosition(operationText, errorIndex) + baseErrorPosition
@@ -79,19 +83,28 @@ class Solver {
     }
 
     @VisibleForTesting
-    internal fun getOperands(operationText: String): List<Double?> {
+    internal fun getOperands(operationText: String, radians: Boolean): List<Double?> {
         val operandStrings = operationText.split(ADD, SUB, MUL, DIV)
         return operandStrings.map { operandString ->
-            if (operandString.contains(POW)) resolvePowers(operandString)
-            else operandString.toDoubleOrNull()
+            when {
+                operandString.contains(POW) -> resolvePowers(operandString)
+                operandString.contains(LOG) -> resolveLogarithm(operandString, LOG)
+                operandString.contains(LN) -> resolveLogarithm(operandString, LN)
+                else -> operandString.toDoubleOrNull()
+            }
+        }
+    }
+
+    private fun resolveLogarithm(operandString: String, base: String): Double? {
+        val operand = operandString.replace(base, "").toDoubleOrNull() ?: return null
+        return when (base) {
+            LOG -> log10(operand)
+            else -> ln(operand)
         }
     }
 
     @VisibleForTesting
     internal fun resolvePowers(operandString: String): Double? {
-        val a = "${MINUS}1".toDoubleOrNull()
-        val b = operandString.split(POW)
-
         val operands = operandString.split(POW).map { it.toDoubleOrNull() }
         val errorIndex = operands.indexOf(null)
         if (errorIndex != -1) return null

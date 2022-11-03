@@ -16,7 +16,7 @@ class SolverTest {
     @Test
     fun `getOperands extract operands`() {
 
-        val result = solver.getOperands("2+2.225−3×5.0÷6.23−346464")
+        val result = solver.getOperands("2+2.225−3×5.0÷6.23−346464", radians = true)
 
         assertEquals(listOf(2.0, 2.225, 3.0, 5.0, 6.23, 346464.0), result)
     }
@@ -35,11 +35,11 @@ class SolverTest {
         val operationText = "2+3×5÷6−2×3+9"
         val resultText = "2+15÷6−6+9"
         val calculation = Calculation(
-            operands = solver.getOperands(operationText) as List<Double>,
+            operands = solver.getOperands(operationText, radians = true) as List<Double>,
             operators = solver.getOperators(operationText)
         )
         val expectedResult = Calculation(
-            operands = solver.getOperands(resultText) as List<Double>,
+            operands = solver.getOperands(resultText, radians = true) as List<Double>,
             operators = solver.getOperators(resultText)
         )
 
@@ -118,7 +118,7 @@ class SolverTest {
         assertEquals(expectedResult, (result as CalculationResult.SyntaxError).cursorPosition)
     }
 
-        @Test
+    @Test
     fun `fix non existing integer zeroes and ending decimal zeroes or dot`() {
         val operationText = ".2+3×4.÷6.400−2×.3−(.5+1).3+9."
         val expectedResult = "0.2+3×4÷6.4−2×0.3−(0.5+1)0.3+9"
@@ -206,5 +206,25 @@ class SolverTest {
         val result = solver.resolvePowers(operandText)
 
         assertEquals(expectedResult, result)
+    }
+
+    @Test
+    fun `resolve log`() {
+        val operandText = "2+LOG(10)+2"
+        val expectedResult = 5.0
+
+        val result = solver.solve(operandText)
+
+        assertEquals(expectedResult, (result as CalculationResult.Success).result, 0.0)
+    }
+
+    @Test
+    fun `resolve ln`() {
+        val operandText = "2+LN(2.7172)+2"
+        val expectedResult = 5.0
+
+        val result = solver.solve(operandText)
+
+        assertEquals(expectedResult, (result as CalculationResult.Success).result, 0.1)
     }
 }
